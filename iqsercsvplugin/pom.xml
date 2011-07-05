@@ -1,0 +1,195 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.sf.iqser.plugin.csv</groupId>
+	<artifactId>iqsercsvplugin</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>CSV ContentProvider for iQser GIN</name>
+	<description>The goal of this project is to provide a ContentProvider plugin for CSV files for iQser GIN Semantic Middleware (www.iqser.com).</description>
+	<url>http://iqsercsvplugin.sourceforge.net</url>
+	
+		<scm>
+		<connection>
+			scm:svn:http://iqsercsvplugin.sourceforge.net/viewvc/iqsercsvplugin/trunk
+		</connection>
+		<developerConnection>
+			scm:svn:https://iqsercsvplugin.svn.sourceforge.net/svnroot/iqsercsvplugin/trunk
+		</developerConnection>
+		<url>http://iqsercsvplugin.svn.sourceforge.net/viewvc/iqsercsvplugin</url>
+	</scm>
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<id>cmagnus71</id>
+			<name>Christian Magnus</name>
+			<email>christian.magnus (at) iqser.net</email>
+			<organization>IQser AG</organization>
+			<organizationUrl>http://www.iqser.com</organizationUrl>
+			<roles>
+				<role>Project Lead</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>jwurzer</id>
+			<name>Jörg Wurzer</name>
+			<email>joerg.wurzer (at) iqser.net</email>
+			<organization>IQser AG</organization>
+			<organizationUrl>http://www.iqser.com</organizationUrl>
+			<roles>
+				<role>Requirement Engineer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>tantusch</id>
+			<name>Tim Antusch</name>
+			<email>tim.antusch (at) iqser.net</email>
+			<organization>IQser AG</organization>
+			<organizationUrl>http://www.iqser.com</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+	
+		<organization>
+		<name>IQser Technologies GmbH</name>
+		<url>http://www.iqser.net</url>
+	</organization>
+	
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<iqser.version>1.6-SNAPSHOT</iqser.version>
+		<compileSource>1.5</compileSource>
+		<sourceforge.artifact>${project.build.directory}/${project.build.finalName}</sourceforge.artifact>
+		<sourceforge.upload>${sf.username},iqsercsvplugin@frs.sourceforge.net:/home/pfs/project/i/iq/iqsercsvplugin</sourceforge.upload>
+	</properties>
+	
+	<build>
+		<plugins>
+			<!-- Die Compile Options immer auf Java 5 setzen, sonst funktionieren die Annotationen nicht. -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<fork>true</fork>
+					<source>${compileSource}</source>
+					<target>${compileSource}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<repositories>
+		<repository>
+			<id>iqser_release</id>
+			<name>Nexus Mirror</name>
+			<url>http://nexus.iqser.com/nexus/content/groups/repo</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>iqsercsvplugin-repo</id>
+			<name>iQser CSV Plugin Repository</name>
+			<url>http://iqsercsvplugin.sourceforge.net/maven2-snap</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>iqsercsvplugin-repo</id>
+			<name>iQser CSV Plugin Repository</name>
+			<url>http://iqsercsvplugin.sourceforge.net/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>iqser_release</id>
+			<url>http://nexus.iqser.com/nexus/content/groups/repo</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	<dependencies>
+		<dependency>
+			<groupId>com.iqser.core</groupId>
+			<artifactId>iqser-core-plugin</artifactId>
+			<version>${iqser.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.7</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.javacsv</groupId>
+			<artifactId>javacsv</artifactId>
+			<version>2.0</version>
+		</dependency>
+	</dependencies>
+	
+	<distributionManagement>
+		<repository>
+			<id>iqsercsvplugin-repo</id>
+			<name>iQser CSV Plugin Repository</name>
+			<url>
+				sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs/maven2
+			</url>
+		</repository>
+		<snapshotRepository>
+			<id>iqsercsvplugin-repo-snap</id>
+			<name>iQser CSV Plugin Snapshot-Repository</name>
+			<url>
+				sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs/maven2-snap
+			</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
+		<site>
+			<id>iqsercsvplugin.sourceforge.net</id>
+			<name>iQser CSV Plugin</name>
+			<url>sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs
+			</url>
+		</site>
+	</distributionManagement>
+	
+	
+</project>
