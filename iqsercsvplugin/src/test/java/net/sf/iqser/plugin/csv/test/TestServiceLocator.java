@@ -28,6 +28,7 @@ public class TestServiceLocator implements ServiceLocator {
 	/** AnalyzerTaskStarter mpckup for testing */
 	private AnalyzerTaskStarter ats = null;
 	
+	/** ContentProviderFacade mockup for testing */
 	private ContentProviderFacade cpf = null;
 	
 	public void setAnalyzerTaskStarter(AnalyzerTaskStarter arg0) {

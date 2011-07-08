@@ -6,18 +6,16 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import junit.framework.TestCase;
-import net.sf.iqser.plugin.csv.test.MockAnalyzerTaskStarter;
-import net.sf.iqser.plugin.csv.test.MockContentProviderFacade;
-import net.sf.iqser.plugin.csv.test.MockRepository;
-import net.sf.iqser.plugin.csv.test.TestServiceLocator;
 
 import org.apache.log4j.PropertyConfigurator;
 
 import com.iqser.core.config.Configuration;
-import com.iqser.core.exception.IQserTechnicalException;
+import com.iqser.core.exception.IQserException;
 import com.iqser.core.model.Attribute;
 import com.iqser.core.model.Content;
-import com.iqser.core.repository.Repository;
+import com.iqser.core.plugin.ContentProviderFacade;
+import net.sf.iqser.plugin.csv.test.MockContentProviderFacade;
+import net.sf.iqser.plugin.csv.test.TestServiceLocator;
 
 public class CSVContentProviderTest extends TestCase {
 	
@@ -44,22 +42,16 @@ public class CSVContentProviderTest extends TestCase {
 				System.getProperty("user.dir") + "/src/test/res/iqser-config.xml"));
 		
 		TestServiceLocator sl = (TestServiceLocator)Configuration.getConfiguration().getServiceLocator();
-		MockRepository rep = new MockRepository();
-		MockContentProviderFacade cpf = new MockContentProviderFacade();
-		rep.init();
-		
-		sl.setRepository(rep);
-		sl.setContentProviderFacade(cpf);
-		sl.setAnalyzerTaskStarter(new MockAnalyzerTaskStarter());
+		sl.setContentProviderFacade(new MockContentProviderFacade());
 	}
 	
 	public void testDoSynchronization() {
 		provider.doSynchonization();
 		
-		Repository rep = Configuration.getConfiguration().getServiceLocator().getRepository();
+		ContentProviderFacade cpf = Configuration.getConfiguration().getServiceLocator().getContentProviderFacade();
 		
 		try {
-			Collection<Content> col = rep.getContentByProvider(provider.getId(), true);
+			Collection<Content> col = cpf.getExistingContents("com.iqser.training.csv.plugin");
 			assertEquals(38, col.size());
 			
 			Iterator<Content> iter = col.iterator();
@@ -80,7 +72,7 @@ public class CSVContentProviderTest extends TestCase {
 					assertTrue(a.isKey());
 				}
 			}
-		} catch (IQserTechnicalException e) {
+		} catch (IQserException e) {
 			e.printStackTrace();
 		}
 	}
@@ -95,12 +87,12 @@ public class CSVContentProviderTest extends TestCase {
 		
 		provider.doHousekeeping();
 		
-		Repository rep = Configuration.getConfiguration().getServiceLocator().getRepository();
+		ContentProviderFacade cpf = Configuration.getConfiguration().getServiceLocator().getContentProviderFacade();
 		
 		try {
-			Collection<Content> col = rep.getContentByProvider(provider.getId(), true);
+			Collection<Content> col = cpf.getExistingContents("com.iqser.training.csv.plugin");
 			assertEquals(37, col.size());
-		} catch (IQserTechnicalException e) {
+		} catch (IQserException e) {
 			e.printStackTrace();
 		}
 	}
