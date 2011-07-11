@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import junit.framework.TestCase;
+import net.sf.iqser.plugin.csv.test.MockContentProviderFacade;
+import net.sf.iqser.plugin.csv.test.TestServiceLocator;
 
 import org.apache.log4j.PropertyConfigurator;
 
@@ -14,8 +16,6 @@ import com.iqser.core.exception.IQserException;
 import com.iqser.core.model.Attribute;
 import com.iqser.core.model.Content;
 import com.iqser.core.plugin.ContentProviderFacade;
-import net.sf.iqser.plugin.csv.test.MockContentProviderFacade;
-import net.sf.iqser.plugin.csv.test.TestServiceLocator;
 
 public class CSVContentProviderTest extends TestCase {
 	
@@ -110,7 +110,7 @@ public class CSVContentProviderTest extends TestCase {
 
 	public void testGetBinaryData() {
 		Content c = provider.getContent("3");
-		String s ="3 Alfred Mandeville Tete Bleue sculpture 23 56 £	250,00 £	150,00";
+		String s ="3 Alfred Mandeville Tete Bleue sculpture 23 56 Â£	250,00 Â£	150,00";
 		
 		assertEquals(s, new String(provider.getBinaryData(c)));
 	}
