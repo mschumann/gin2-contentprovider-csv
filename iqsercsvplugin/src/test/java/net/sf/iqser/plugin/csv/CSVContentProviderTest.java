@@ -51,7 +51,7 @@ public class CSVContentProviderTest extends TestCase {
 		ContentProviderFacade cpf = Configuration.getConfiguration().getServiceLocator().getContentProviderFacade();
 		
 		try {
-			Collection<Content> col = cpf.getExistingContents("com.iqser.training.csv.plugin");
+			Collection<Content> col = cpf.getExistingContents("net.sf.iqser.plugin.csv");
 			assertEquals(38, col.size());
 			
 			Iterator<Content> iter = col.iterator();
@@ -90,7 +90,7 @@ public class CSVContentProviderTest extends TestCase {
 		ContentProviderFacade cpf = Configuration.getConfiguration().getServiceLocator().getContentProviderFacade();
 		
 		try {
-			Collection<Content> col = cpf.getExistingContents("com.iqser.training.csv.plugin");
+			Collection<Content> col = cpf.getExistingContents("net.sf.iqser.plugin.csv");
 			assertEquals(37, col.size());
 		} catch (IQserException e) {
 			e.printStackTrace();
