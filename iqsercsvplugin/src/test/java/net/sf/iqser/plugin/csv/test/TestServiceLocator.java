@@ -17,7 +17,7 @@ import com.iqser.core.tracker.Tracker;
 /**
  * Supports testing of the csv content provider
  * 
- * @author Jšrg Wurzer
+ * @author Joerg Wurzer
  *
  */
 public class TestServiceLocator implements ServiceLocator {

@@ -35,7 +35,7 @@ import com.iqser.core.plugin.AbstractContentProvider;
  * Content provider demonstrating how to access CSV files. It should be part of 
  * the file plugin package for a productive system.
  * 
- * @author Jšrg Wurzer
+ * @author Joerg Wurzer
  *
  */
 public class CSVContentProvider extends AbstractContentProvider {
