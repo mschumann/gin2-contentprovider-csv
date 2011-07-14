@@ -52,7 +52,7 @@ public class CSVContentProviderTest extends TestCase {
 		
 		try {
 			Collection<Content> col = cpf.getExistingContents("net.sf.iqser.plugin.csv");
-			assertEquals(38, col.size());
+			assertEquals(37, col.size());
 			
 			Iterator<Content> iter = col.iterator();
 			
@@ -105,12 +105,12 @@ public class CSVContentProviderTest extends TestCase {
 	}
 
 	public void testGetContentUrls() {
-		assertEquals(38, provider.getContentUrls().size());
+		assertEquals(37, provider.getContentUrls().size());
 	}
 
 	public void testGetBinaryData() {
 		Content c = provider.getContent("3");
-		String s ="3 Alfred Mandeville Tete Bleue sculpture 23 56 £	250,00 £	150,00";
+		String s ="3 Alfred Mandeville Tete Bleue sculpture 23 56 Â£ 250,00 Â£ 150,00";
 		
 		assertEquals(s, new String(provider.getBinaryData(c)));
 	}
