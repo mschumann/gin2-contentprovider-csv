@@ -218,7 +218,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 						int type = Attribute.ATTRIBUTE_TYPE_TEXT;
 						// 1. key attribute is used in syntax analysis
 						// 2. key attributes are searchable and accessible in client connector
-						boolean key = getInitParams().getProperty("key-attributes", "Name").contains(name);
+						boolean key = getInitParams().getProperty("key-attributes", "Name").contains("[" + name + "]");
 						
 						if (value != null && value.length() > 0) {
 							c.addAttribute(new Attribute(name, value, type, key));
