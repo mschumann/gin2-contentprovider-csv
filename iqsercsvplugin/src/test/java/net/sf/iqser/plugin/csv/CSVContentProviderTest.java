@@ -37,6 +37,7 @@ public class CSVContentProviderTest extends TestCase {
 		provider.setInitParams(initParams);
 		provider.setId("net.sf.iqser.plugin.csv");
 		provider.setType("Artwork");
+		provider.init();
 		
 		Configuration.configure(new File(
 				System.getProperty("user.dir") + "/src/test/res/iqser-config.xml"));
@@ -82,9 +83,7 @@ public class CSVContentProviderTest extends TestCase {
 		
 		provider.getInitParams().setProperty(
 				"csv-file", 
-				System.getProperty("user.dir") + "/src/test/res/artcollection.csv");
-		provider.lastSync = -1;
-		
+				System.getProperty("user.dir") + "/src/test/res/artcollection.csv");		
 		provider.doHousekeeping();
 		
 		ContentProviderFacade cpf = Configuration.getConfiguration().getServiceLocator().getContentProviderFacade();

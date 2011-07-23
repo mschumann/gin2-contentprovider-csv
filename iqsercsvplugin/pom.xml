@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -10,7 +9,7 @@
 	<name>CSV ContentProvider for iQser GIN</name>
 	<description>The goal of this project is to provide a ContentProvider plugin for CSV files for iQser GIN Semantic Middleware (www.iqser.com).</description>
 	<url>http://iqsercsvplugin.sourceforge.net</url>
-	
+
 	<licenses>
 		<license>
 			<name>Apache 2</name>
@@ -19,7 +18,7 @@
 			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
-	
+
 	<scm>
 		<connection>
 			scm:svn:http://iqsercsvplugin.sourceforge.net/viewvc/iqsercsvplugin/trunk
@@ -29,8 +28,7 @@
 		</developerConnection>
 		<url>http://iqsercsvplugin.svn.sourceforge.net/viewvc/iqsercsvplugin</url>
 	</scm>
-	
-	
+
 	<developers>
 		<developer>
 			<id>cmagnus71</id>
@@ -65,14 +63,25 @@
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>kbudisantoso</id>
+			<name>Kresnadi Budisantoso</name>
+			<email>kresnadi.budisantoso (at) iqser.net</email>
+			<organization>IQser GmbH</organization>
+			<organizationUrl>http://www.iqser.com</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
-	
+
 	<organization>
 		<name>IQser Technologies GmbH</name>
 		<url>http://www.iqser.net</url>
 	</organization>
-	
-	
+
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<iqser.version>1.5</iqser.version>
@@ -80,7 +89,7 @@
 		<sourceforge.artifact>${project.build.directory}/${project.build.finalName}</sourceforge.artifact>
 		<sourceforge.upload>${sf.username},iqsercsvplugin@frs.sourceforge.net:/home/pfs/project/i/iq/iqsercsvplugin</sourceforge.upload>
 	</properties>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -175,7 +184,7 @@
 					<instrumentation>
 						<excludes>
 							<exclude>**/*$*</exclude>
-							<exclude>**/*Test.class</exclude>							
+							<exclude>**/*Test.class</exclude>
 							<exclude>**/*Exception.class</exclude>
 						</excludes>
 					</instrumentation>
@@ -278,7 +287,7 @@
 			</extension>
 		</extensions>
 	</build>
-	
+
 	<repositories>
 		<repository>
 			<id>iqser_release</id>
@@ -351,7 +360,7 @@
 			<version>2.0</version>
 		</dependency>
 	</dependencies>
-	
+
 	<reporting>
 		<plugins>
 			<plugin>
@@ -400,7 +409,7 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>iqsercsvplugin-repo</id>
@@ -424,6 +433,4 @@
 			</url>
 		</site>
 	</distributionManagement>
-	
-	
 </project>
