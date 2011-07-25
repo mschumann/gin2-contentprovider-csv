@@ -27,23 +27,24 @@ public class CSVContentProviderTest extends TestCase {
 				
 		super.setUp();
 		
+		Configuration.configure(new File(
+				System.getProperty("user.dir") + "/src/test/res/iqser-config.xml"));
+		
+		TestServiceLocator sl = (TestServiceLocator)Configuration.getConfiguration().getServiceLocator();
+		sl.setContentProviderFacade(new MockContentProviderFacade());
+
 		Properties initParams = new Properties();
 		initParams.setProperty(
 				"csv-file", System.getProperty("user.dir") + "/artcollection.csv");
-		initParams.setProperty("key-attributes", "ARTIST TITLE MEDIUM Guide");
+		initParams.setProperty("key-attributes", "[ARTIST] [TITLE] [MEDIUM] [Guide]");
 		initParams.setProperty("url-attribute", "NO");
 		
 		provider = new CSVContentProvider();
 		provider.setInitParams(initParams);
 		provider.setId("net.sf.iqser.plugin.csv");
 		provider.setType("Artwork");
+		
 		provider.init();
-		
-		Configuration.configure(new File(
-				System.getProperty("user.dir") + "/src/test/res/iqser-config.xml"));
-		
-		TestServiceLocator sl = (TestServiceLocator)Configuration.getConfiguration().getServiceLocator();
-		sl.setContentProviderFacade(new MockContentProviderFacade());
 	}
 	
 	public void testDoSynchronization() {
@@ -109,7 +110,7 @@ public class CSVContentProviderTest extends TestCase {
 
 	public void testGetBinaryData() {
 		Content c = provider.getContent("3");
-		String s ="3 Alfred Mandeville Tete Bleue sculpture 23 56 Â£ 250,00 Â£ 150,00";
+		String s ="3 Alfred Mandeville Tete Bleue sculpture 23 56 \u00A3 250,00 \u00A3 150,00";
 		
 		assertEquals(s, new String(provider.getBinaryData(c)));
 	}

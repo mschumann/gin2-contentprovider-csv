@@ -69,6 +69,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 	// for backward compatibility
 	private static final String CSV_PROPERTY_FILE_OBSOLETE = "csv-file";
 	private static final String CSV_PROPERTY_IDCOLUMN_OBSOLETE = "url-attribute";
+	private static final String CSV_PROPERTY_KEYCOLUMNS_OBSOLETE = "key-attributes";
 
 	public static final String CSV_DEFAULT_DELIMETER = ";";
 	public static final String CSV_DEFAULT_CHARSET = "UTF-8";
@@ -83,8 +84,8 @@ public class CSVContentProvider extends AbstractContentProvider {
 	/** The settings (set by init params). */
 	private Properties settings;
 
-	/** The filename of the csv file. */
-	private String filename;
+	/** The csv file. */
+	private File file;
 
 	/** The delimeter character of the csv file. */
 	private char delimeter;
@@ -176,17 +177,39 @@ public class CSVContentProvider extends AbstractContentProvider {
 		this.settings = getInitParams();
 
 		// Setting the file's name.
-		String filenameProperty = this.settings.getProperty(CSV_PROPERTY_FILE,
-				"").trim();
-		if ("".equals(filenameProperty)) {
-			filenameProperty = this.settings
-					.getProperty(CSV_PROPERTY_FILE_OBSOLETE);
-			if (null == filenameProperty || "".equals(filenameProperty.trim())) {
+		String filename = this.settings.getProperty(CSV_PROPERTY_FILE, "")
+				.trim();
+		if ("".equals(filename)) {
+			filename = this.settings.getProperty(CSV_PROPERTY_FILE_OBSOLETE);
+			if (null == filename || "".equals(filename.trim())) {
 				logger.error("No csv file specified in configuration!");
-				filenameProperty = null;
+				filename = null;
 			}
 		}
-		this.filename = filenameProperty;
+
+		// Setting the file
+		if (null != filename && !"".equals(filename.trim())) {
+
+			URI fileUri = null;
+			try {
+				fileUri = new URI(filename);
+				logger.info("CSV filename: " + filename);
+				logger.info("URI of CSV file: " + fileUri
+						+ ". URI is absolute? " + fileUri.isAbsolute());
+			} catch (URISyntaxException e) {
+				if (logger.isDebugEnabled()) {
+					logger.warn(filename + " is no vaild URI.", e);
+				} else {
+					logger.warn(filename + " is no vaild URI.");
+				}
+			}
+
+			if (null == fileUri || !fileUri.isAbsolute()) {
+				this.file = new File(filename);
+			} else {
+				this.file = new File(fileUri);
+			}
+		}
 
 		// Setting the file's delimeter.
 		this.delimeter = this.settings
@@ -261,10 +284,12 @@ public class CSVContentProvider extends AbstractContentProvider {
 		this.modified = true;
 		this.contentMap = new HashMap<String, Content>();
 
+		// this.getContentUrls();
 	}
 
 	/**
-	 * Optional method if any addiotnal process is required to stop the provider
+	 * Optional method if any additional process is required to stop the
+	 * provider
 	 * 
 	 * @see com.iqser.core.plugin.AbstractContentProvider#destroy()
 	 */
@@ -343,6 +368,9 @@ public class CSVContentProvider extends AbstractContentProvider {
 	public Content getContent(String contentUrl) {
 		logger.info(String.format("Invoking %s#getContent(String url) ...",
 				this.getClass().getSimpleName()));
+		if (0 == contentMap.size()) {
+			this.getContentUrls();
+		}
 		return contentMap.get(contentUrl);
 	}
 
@@ -358,44 +386,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 		logger.info(String.format("Invoking %s#getBinaryData(Content c) ...",
 				this.getClass().getSimpleName()));
 
-		if (null != this.filename && !"".equals(this.filename.trim())) {
-
-			URI fileUri = null;
-			try {
-				fileUri = new URI(filename);
-				logger.info("CSV filename: " + this.filename);
-				logger.info("URI of CSV file: " + fileUri
-						+ ". URI is absolute? " + fileUri.isAbsolute());
-			} catch (URISyntaxException e) {
-				logger.warn(this.filename + " is no vaild URI.", e);
-			}
-
-			File file;
-			if (null == fileUri || !fileUri.isAbsolute()) {
-				file = new File(filename);
-			} else {
-				file = new File(fileUri);
-			}
-
-			logger.info("Reading CSV file: " + file.toURI().toString());
-
-			if (file.exists() && file.isFile() && file.canRead()) {
-				FileInputStream fileInputStream;
-				try {
-					fileInputStream = new FileInputStream(file);
-					byte[] data = new byte[(int) file.length()];
-					fileInputStream.read(data);
-					fileInputStream.close();
-					return data;
-				} catch (FileNotFoundException e) {
-					logger.error("Could not read file: " + this.filename, e);
-				} catch (IOException e) {
-					logger.error("Could not read file: " + this.filename, e);
-				}
-			}
-		}
-
-		return new byte[0];
+		return c.getFulltext().getBytes();
 	}
 
 	/**
@@ -435,235 +426,209 @@ public class CSVContentProvider extends AbstractContentProvider {
 		logger.info(String.format("Invoking %s#getContentUrls() ...", this
 				.getClass().getSimpleName()));
 
-		if (null != this.filename && !"".equals(this.filename.trim())) {
+		if (null != this.file && this.file.exists() && this.file.isFile()
+				&& this.file.canRead()) {
+			logger.info("Reading CSV file: " + this.file.toURI().toString());
 
-			URI fileUri = null;
-			try {
-				fileUri = new URI(filename);
-				logger.info("CSV filename: " + this.filename);
-				logger.info("URI of CSV file: " + fileUri
-						+ ". URI is absolute? " + fileUri.isAbsolute());
-			} catch (URISyntaxException e) {
-				logger.warn(this.filename + " is no vaild URI.", e);
-			}
+			if (this.contentMap.isEmpty()
+					|| this.modificationTimestamp < this.file.lastModified()) {
+				this.modificationTimestamp = this.file.lastModified();
+				this.modified = true;
+				this.contentMap.clear();
 
-			File file;
-			if (null == fileUri || !fileUri.isAbsolute()) {
-				file = new File(filename);
-			} else {
-				file = new File(fileUri);
-			}
+				CsvReader csvReader = null;
+				try {
+					csvReader = new CsvReader(new InputStreamReader(
+							new FileInputStream(this.file), this.charset),
+							delimeter);
+				} catch (FileNotFoundException e) {
+					logger.error("Could not read file: " + this.file.getPath(),
+							e);
+					return this.contentMap.keySet();
+				}
 
-			logger.info("Reading CSV file: " + file.toURI().toString());
+				int row = 0;
+				int columnCount = 0;
+				String[] attributes = new String[1];
+				try {
+					while (csvReader.readRecord()) {
+						if (0 < row++) {
+							Content content = new Content();
+							content.setType(this.getType());
+							content.setProvider(this.getId());
+							content.setModificationDate(modificationTimestamp);
 
-			if (file.exists() && file.isFile() && file.canRead()) {
-				if (this.contentMap.isEmpty()
-						|| this.modificationTimestamp < file.lastModified()) {
-					this.modificationTimestamp = file.lastModified();
-					this.modified = true;
-					this.contentMap.clear();
+							if (logger.isDebugEnabled()) {
+								logger.debug(String
+										.format("Building content object of type '%s'.",
+												this.getType()));
+							}
 
-					CsvReader csvReader = null;
-					try {
-						csvReader = new CsvReader(new InputStreamReader(
-								new FileInputStream(file), this.charset),
-								delimeter);
-					} catch (FileNotFoundException e) {
-						logger.error("Could not read file: " + this.filename, e);
-						return this.contentMap.keySet();
-					}
+							for (int i = 0; i < columnCount; i++) {
+								if (null == attributes[i]
+										|| "".equals(attributes[i].trim())) {
+									// skip this column
+									continue;
+								}
 
-					int row = 0;
-					int columnCount = 0;
-					String[] attributes = new String[1];
-					try {
-						while (csvReader.readRecord()) {
-							if (0 < row++) {
-								Content content = new Content();
-								content.setType(this.getType());
-								content.setProvider(this.getId());
-								content.setModificationDate(modificationTimestamp);
-
+								String attributeValue = csvReader.get(i).trim();
 								if (logger.isDebugEnabled()) {
 									logger.debug(String
-											.format("Building content object of type '%s'.",
-													this.getType()));
+											.format("\tBuilding attribute object - %s = %s",
+													attributes[i],
+													attributeValue));
 								}
 
-								for (int i = 0; i < columnCount; i++) {
-									if (null == attributes[i]
-											|| "".equals(attributes[i].trim())) {
-										// skip this column
-										continue;
-									}
-
-									String attributeValue = csvReader.get(i)
-											.trim();
-									if (logger.isDebugEnabled()) {
-										logger.debug(String
-												.format("\tBuilding attribute object - %s = %s",
-														attributes[i],
-														attributeValue));
-									}
-
-									// removing quotes at the beginning and at
-									// the end
-									if (attributeValue.startsWith("\"")
-											&& attributeValue.endsWith("\"")) {
-										attributeValue = attributeValue
-												.substring(
-														1,
-														attributeValue.length() - 1);
-										attributeValue.replace("\"\"", "\"");
-									}
-
-									Attribute attribute = new Attribute(
-											attributes[i], attributeValue,
-											Attribute.ATTRIBUTE_TYPE_TEXT,
-											this.keyColumns.contains(Integer
-													.valueOf(i)));
-
-									if (i == this.idColumn) {
-										if (this.idAsContentUrl) {
-											content.setContentUrl(attribute
-													.getValue());
-										} else {
-											content.setContentUrl(CSV_CONTENT_URI_BASE
-													+ this.getType()
-															.toLowerCase()
-													+ "/"
-													+ attribute.getValue());
-										}
-									}
-
-									String fulltext = null;
-									if (i == this.fulltextColumn) {
-										fulltext = attribute.getValue();
-									} else if (!this.ignoreColumns
-											.contains(Integer.valueOf(i))
-											&& null != attribute.getValue()
-											&& !"".equals(attribute.getValue()
-													.trim())) {
-										// empty attributes, the fulltext
-										// attribute (if present) and those that
-										// should be ignored are not added to
-										// the content object
-										Attribute existingAttribute = content
-												.getAttributeByName(attribute
-														.getName());
-										if (null != existingAttribute) {
-											existingAttribute
-													.addValue(attribute
-															.getValue());
-										} else {
-											content.addAttribute(attribute);
-										}
-									}
-
-									if (null == fulltext) {
-										// take the whole row as fulltext
-										fulltext = csvReader.getRawRecord()
-												.replace(';', ' ');
-									}
-
-									if (null != fulltext) {
-										fulltext = fulltext.replace('(', ' ');
-										fulltext = fulltext.replace(')', ' ');
-										fulltext = fulltext.replace('{', ' ');
-										fulltext = fulltext.replace('}', ' ');
-										fulltext = fulltext.replace('[', ' ');
-										fulltext = fulltext.replace(']', ' ');
-										fulltext = fulltext.replace('<', ' ');
-										fulltext = fulltext.replace('>', ' ');
-										content.setFulltext(fulltext);
-									}
-
+								// removing quotes at the beginning and at
+								// the end
+								if (attributeValue.startsWith("\"")
+										&& attributeValue.endsWith("\"")) {
+									attributeValue = attributeValue.substring(
+											1, attributeValue.length() - 1);
+									attributeValue.replace("\"\"", "\"");
 								}
 
-								contentMap
-										.put(content.getContentUrl(), content);
-							} else {
-								// processing first row
-								columnCount = csvReader.getColumnCount();
-								attributes = new String[columnCount];
-								for (int i = 0; i < columnCount; i++) {
-									String attribute = csvReader.get(i);
-									if (null != attribute
-											&& !"".equals(attribute.trim())) {
-										attribute = attribute.trim();
+								Attribute attribute = new Attribute(
+										attributes[i], attributeValue,
+										Attribute.ATTRIBUTE_TYPE_TEXT,
+										this.keyColumns.contains(Integer
+												.valueOf(i)));
 
-										// removing quotes at the beginning and
-										// at the end
-										if (attribute.trim().startsWith("\"")
-												&& attribute.trim().endsWith(
-														"\"")) {
-											attribute = attribute.substring(1,
-													attribute.length() - 1);
-											attribute.replace("\"\"", "\"");
+								if (i == this.idColumn) {
+									if (this.idAsContentUrl) {
+										content.setContentUrl(attribute
+												.getValue());
+									} else {
+										content.setContentUrl(CSV_CONTENT_URI_BASE
+												+ this.getType().toLowerCase()
+												+ "/" + attribute.getValue());
+									}
+								}
+
+								String fulltext = null;
+								if (i == this.fulltextColumn) {
+									fulltext = attribute.getValue();
+								} else if (!this.ignoreColumns.contains(Integer
+										.valueOf(i))
+										&& null != attribute.getValue()
+										&& !"".equals(attribute.getValue()
+												.trim())) {
+									// empty attributes, the fulltext
+									// attribute (if present) and those that
+									// should be ignored are not added to
+									// the content object
+									Attribute existingAttribute = content
+											.getAttributeByName(attribute
+													.getName());
+									if (null != existingAttribute) {
+										existingAttribute.addValue(attribute
+												.getValue());
+									} else {
+										content.addAttribute(attribute);
+									}
+								}
+
+								if (null == fulltext) {
+									// take the whole row as fulltext
+									fulltext = csvReader.getRawRecord()
+											.replace(';', ' ');
+								}
+
+								if (null != fulltext) {
+									fulltext = fulltext.replace('(', ' ');
+									fulltext = fulltext.replace(')', ' ');
+									fulltext = fulltext.replace('{', ' ');
+									fulltext = fulltext.replace('}', ' ');
+									fulltext = fulltext.replace('[', ' ');
+									fulltext = fulltext.replace(']', ' ');
+									fulltext = fulltext.replace('<', ' ');
+									fulltext = fulltext.replace('>', ' ');
+									content.setFulltext(fulltext);
+								}
+
+							}
+
+							contentMap.put(content.getContentUrl(), content);
+						} else {
+							// processing first row
+							columnCount = csvReader.getColumnCount();
+							attributes = new String[columnCount];
+							for (int i = 0; i < columnCount; i++) {
+								String attribute = csvReader.get(i);
+								if (null != attribute
+										&& !"".equals(attribute.trim())) {
+									attribute = attribute.trim();
+
+									// removing quotes at the beginning and
+									// at the end
+									if (attribute.trim().startsWith("\"")
+											&& attribute.trim().endsWith("\"")) {
+										attribute = attribute.substring(1,
+												attribute.length() - 1);
+										attribute.replace("\"\"", "\"");
+									}
+
+									attributes[i] = attribute.toUpperCase()
+											.replace("\u00C4", "AE")
+											.replace("\u00D6", "OE")
+											.replace("\u00DC", "UE")
+											.replace("\u00DF", "SS")
+											.replace("\"", " ").trim()
+											.replace("  ", " ")
+											.replace(' ', '_');
+
+									// support former configuration syntax
+									if (null == this.settings
+											.getProperty(CSV_PROPERTY_IDCOLUMN)) {
+										String idColumnProperty = this.settings
+												.getProperty(
+														CSV_PROPERTY_IDCOLUMN_OBSOLETE,
+														"").trim();
+										if (!"".equals(idColumnProperty)
+												&& attribute
+														.equals(idColumnProperty)) {
+											this.idColumn = i;
+											this.idAsContentUrl = true;
 										}
+									}
 
-										attributes[i] = attribute.toUpperCase()
-												.replace("\u00C4", "AE")
-												.replace("\u00D6", "OE")
-												.replace("\u00DC", "UE")
-												.replace("\u00DF", "SS")
-												.replace("\"", " ").trim()
-												.replace("  ", " ")
-												.replace(' ', '_');
-
-										// support former configuration syntax
-										if (null == this.settings
-												.getProperty(CSV_PROPERTY_IDCOLUMN)) {
-											String idColumnProperty = this.settings
-													.getProperty(
-															CSV_PROPERTY_IDCOLUMN_OBSOLETE,
-															"").trim();
-											if (!"".equals(idColumnProperty)
-													&& attribute
-															.equals(idColumnProperty)) {
-												this.idColumn = i;
-												this.idAsContentUrl = true;
+									// support former configuration syntax
+									if (null == this.settings
+											.getProperty(CSV_PROPERTY_KEYCOLUMNS)) {
+										String keyColumnsProperty = this.settings
+												.getProperty(
+														CSV_PROPERTY_KEYCOLUMNS_OBSOLETE,
+														"").trim();
+										if (!"".equals(keyColumnsProperty)
+												&& keyColumnsProperty
+														.contains("["
+																+ attribute
+																+ "]")) {
+											if (keyColumnCompatibilityMode) {
+												keyColumns.add(Integer
+														.valueOf(i));
+											} else {
+												keyColumns.clear();
+												keyColumns.add(Integer
+														.valueOf(i));
+												keyColumnCompatibilityMode = true;
 											}
 										}
-
-										// support former configuration syntax
-										if (null == this.settings
-												.getProperty(CSV_PROPERTY_KEYCOLUMNS)) {
-											String keyColumnsProperty = this.settings
-													.getProperty(
-															CSV_PROPERTY_IDCOLUMN_OBSOLETE,
-															"").trim();
-											if (!"".equals(keyColumnsProperty)
-													&& keyColumnsProperty
-															.contains("["
-																	+ attribute
-																	+ "]")) {
-												if (keyColumnCompatibilityMode) {
-													keyColumns.add(Integer
-															.valueOf(i));
-												} else {
-													keyColumns.clear();
-													keyColumns.add(Integer
-															.valueOf(i));
-													keyColumnCompatibilityMode = true;
-												}
-											}
-										}
-									} // end if
-								} // end for
-							} // end else
-						} // end while
-					} catch (IOException e) {
-						logger.error("Error occured while reading file: "
-								+ CSV_PROPERTY_FILE, e);
-					} finally {
-						csvReader.close();
-					}
-				} else {
-					this.modified = false;
+									}
+								} // end if
+							} // end for
+						} // end else
+					} // end while
+				} catch (IOException e) {
+					logger.error("Error occured while reading file: "
+							+ CSV_PROPERTY_FILE, e);
+				} finally {
+					csvReader.close();
 				}
+			} else {
+				this.modified = false;
 			}
-		}
+		} // end if
 
 		return this.contentMap.keySet();
 
