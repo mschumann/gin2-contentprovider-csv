@@ -110,7 +110,7 @@ public class CSVContentProviderTest extends TestCase {
 
 	public void testGetBinaryData() {
 		Content c = provider.getContent("3");
-		String s ="3 Alfred Mandeville Tete Bleue sculpture 23 56 \u00A3 250,00 \u00A3 150,00";
+		String s ="3 Alfred Mandeville Tete Bleue sculpture 23 56 250,00 150,00";
 		
 		assertEquals(s, new String(provider.getBinaryData(c)));
 	}
