@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 	private static final String CSV_PROPERTY_CHARSET = "charset";
 	private static final String CSV_PROPERTY_IDCOLUMN = "column.id";
 	private static final String CSV_PROPERTY_IDASCONTENTURL = "column.idAsContentUrl";
+	private static final String CSV_PROPERTY_IDCOLUMNS = "columns.id";
 	private static final String CSV_PROPERTY_KEYCOLUMNS = "columns.key";
 	private static final String CSV_PROPERTY_IGNORECOLUMNS = "columns.ignore";
 	private static final String CSV_PROPERTY_FULLTEXTCOLUMN = "column.fulltext";
@@ -90,9 +92,8 @@ public class CSVContentProvider extends AbstractContentProvider {
 	/** The delimeter character of the csv file. */
 	private char delimeter;
 
-	/** The zero-based number of the column that holds the unique identifiers. */
-	private int idColumn;
-
+	/** Zero-based list of columns that will be used as composite id. */
+	private List<Integer> idColumns;
 	/**
 	 * If TRUE, the value of the ID column will be used as ContentUrl, else an
 	 * artificial URI will be generated.
@@ -228,9 +229,29 @@ public class CSVContentProvider extends AbstractContentProvider {
 							charsetProperty, charset.displayName()));
 		}
 
-		// Setting the zero-based number of the id-column.
-		this.idColumn = Integer.parseInt(this.settings.getProperty(
-				CSV_PROPERTY_IDCOLUMN, CSV_DEFAULT_IDCOLUMN));
+		// Setting the zero-based list of numbers of the id-columns.
+		String idColumnsProperty = this.settings
+				.getProperty(CSV_PROPERTY_IDCOLUMNS);
+		if (null == idColumnsProperty || "".equals(idColumnsProperty.trim())) {
+			idColumnsProperty = this.settings.getProperty(
+					CSV_PROPERTY_IDCOLUMN, CSV_DEFAULT_IDCOLUMN);
+		}
+		String[] idColumnStrings = idColumnsProperty.split(",");
+		this.idColumns = new ArrayList<Integer>();
+		for (int i = 0; i < idColumnStrings.length; i++) {
+			try {
+				if (!(null == idColumnStrings[i] || ""
+						.equals(idColumnStrings[i].trim()))) {
+					this.idColumns.add(i,
+							Integer.parseInt(idColumnStrings[i].trim()));
+				}
+			} catch (NumberFormatException e) {
+				logger.error("Could not identify id column for value: '"
+						+ idColumnStrings[i]
+						+ "'\nList of id columns is corrupted!", e);
+				throw e;
+			}
+		}
 
 		// Setting the boolean idAsContentUrl-flag.
 		this.idAsContentUrl = Boolean.parseBoolean(settings.getProperty(
@@ -494,14 +515,35 @@ public class CSVContentProvider extends AbstractContentProvider {
 										this.keyColumns.contains(Integer
 												.valueOf(i)));
 
-								if (i == this.idColumn) {
-									if (this.idAsContentUrl) {
+								if (this.idColumns.contains(Integer.valueOf(i))
+										&& null != attribute.getValue()
+										&& !"".equals(attribute.getValue()
+												.trim())) {
+									if (1 == this.idColumns.size()
+											&& this.idAsContentUrl) {
 										content.setContentUrl(attribute
 												.getValue());
-									} else {
+									} else if (null == content.getContentUrl()
+											|| "".equals(content
+													.getContentUrl().trim())) {
 										content.setContentUrl(CSV_CONTENT_URI_BASE
-												+ this.getType().toLowerCase()
-												+ "/" + attribute.getValue());
+												+ URLEncoder.encode(this
+														.getType()
+														.toLowerCase(),
+														"ISO-8859-1")
+
+												+ "/"
+												+ URLEncoder.encode(
+														attribute.getValue(),
+														"ISO-8859-1"));
+									} else {
+										content.setContentUrl(content
+												.getContentUrl()
+												.concat("/"
+														+ URLEncoder.encode(
+																attribute
+																		.getValue(),
+																"ISO-8859-1")));
 									}
 								}
 
@@ -579,7 +621,9 @@ public class CSVContentProvider extends AbstractContentProvider {
 
 									// support former configuration syntax
 									if (null == this.settings
-											.getProperty(CSV_PROPERTY_IDCOLUMN)) {
+											.getProperty(CSV_PROPERTY_IDCOLUMNS)
+											&& null == this.settings
+													.getProperty(CSV_PROPERTY_IDCOLUMN)) {
 										String idColumnProperty = this.settings
 												.getProperty(
 														CSV_PROPERTY_IDCOLUMN_OBSOLETE,
@@ -587,7 +631,9 @@ public class CSVContentProvider extends AbstractContentProvider {
 										if (!"".equals(idColumnProperty)
 												&& attribute
 														.equals(idColumnProperty)) {
-											this.idColumn = i;
+											this.idColumns.clear();
+											this.idColumns.add(Integer
+													.valueOf(i));
 											this.idAsContentUrl = true;
 										}
 									}

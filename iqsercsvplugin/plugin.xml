@@ -26,13 +26,14 @@
 			<param-value>ISO-8859-1</param-value>
 		</init-param>
 		<init-param>
-			<!-- default: 0 (zero based number of the column with IDs) -->
-			<param-name>column.id</param-name>
+			<!-- default: 0 (comma seperated list of zero based numbers of the ID-columns) -->
+			<param-name>columns.id</param-name>
 			<param-value>0</param-value>
 		</init-param>
 		<init-param>
-			<!-- default: false (if true, the ID column will be used as ContentUrl, 
-				else the ContentUrl will look like this: iqser://iqsercsvplugin.sf.net/[TYPE]/[ID-COLUMN-VALUE]) -->
+			<!-- default: false (if true and if there is only a single ID column, 
+				the ID column will be used as ContentUrl, else the ContentUrl will look like 
+				this: iqser://iqsercsvplugin.sf.net/[TYPE]/[ID-COLUMN-VALUE-1]/[ID-COLUMN-VALUE-2]/[...]) -->
 			<param-name>column.idAsContentUrl</param-name>
 			<param-value>false</param-value>
 		</init-param>
