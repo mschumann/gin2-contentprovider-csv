@@ -208,7 +208,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 			if (null == fileUri || !fileUri.isAbsolute()) {
 				this.file = new File(filename);
 			} else {
-				this.file = new File(fileUri);
+				this.file = new File(fileUri.getPath());
 			}
 		}
 
