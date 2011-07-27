@@ -64,6 +64,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 	private static final String CSV_PROPERTY_IDCOLUMN = "column.id";
 	private static final String CSV_PROPERTY_IDASCONTENTURL = "column.idAsContentUrl";
 	private static final String CSV_PROPERTY_IDCOLUMNS = "columns.id";
+	private static final String CSV_PROPERTY_NAMECOLUMN = "column.name";
 	private static final String CSV_PROPERTY_KEYCOLUMNS = "columns.key";
 	private static final String CSV_PROPERTY_IGNORECOLUMNS = "columns.ignore";
 	private static final String CSV_PROPERTY_FULLTEXTCOLUMN = "column.fulltext";
@@ -78,6 +79,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 	public static final String CSV_DEFAULT_IDCOLUMN = "0";
 	public static final String CSV_DEFAULT_IDASCONTENTURL = "false";
 	public static final String CSV_DEFAULT_KEYCOLUMNS = "";
+	public static final String CSV_DEFAULT_NAMECOLUMN = "-1";
 	public static final String CSV_DEFAULT_IGNORECOLUMNS = "";
 	public static final String CSV_DEFAULT_FULLTEXTCOLUMN = "-1";
 
@@ -102,6 +104,9 @@ public class CSVContentProvider extends AbstractContentProvider {
 
 	/** The zero-based number of the column that holds the fulltext part. */
 	private int fulltextColumn;
+
+	/** The zero-based number of the column that should be used as name column. */
+	private int nameColumn;
 
 	/** Zero-based list of columns that will be used as keys. */
 	private List<Integer> keyColumns;
@@ -260,6 +265,10 @@ public class CSVContentProvider extends AbstractContentProvider {
 		// Setting the zero-based number of the fulltext-column.
 		this.fulltextColumn = Integer.parseInt(this.settings.getProperty(
 				CSV_PROPERTY_FULLTEXTCOLUMN, CSV_DEFAULT_FULLTEXTCOLUMN));
+
+		// Setting the zero-based number of the fulltext-column.
+		this.nameColumn = Integer.parseInt(this.settings.getProperty(
+				CSV_PROPERTY_NAMECOLUMN, CSV_DEFAULT_NAMECOLUMN));
 
 		// Setting the key columns.
 		String[] keyColumnStrings = this.settings.getProperty(
@@ -568,6 +577,17 @@ public class CSVContentProvider extends AbstractContentProvider {
 									} else {
 										content.addAttribute(attribute);
 									}
+								}
+
+								if (i == this.nameColumn
+										&& null != attributeValue
+										&& !"".equals(attributeValue)
+										&& null == content
+												.getAttributeByName("NAME")) {
+									content.addAttribute(new Attribute("NAME",
+											attributeValue,
+											Attribute.ATTRIBUTE_TYPE_TEXT,
+											false));
 								}
 
 								if (null == fulltext) {
