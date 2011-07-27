@@ -505,8 +505,8 @@ public class CSVContentProvider extends AbstractContentProvider {
 								if (attributeValue.startsWith("\"")
 										&& attributeValue.endsWith("\"")) {
 									attributeValue = attributeValue.substring(
-											1, attributeValue.length() - 1);
-									attributeValue.replace("\"\"", "\"");
+											1, attributeValue.length() - 1)
+											.replace("\"\"", "\"");
 								}
 
 								Attribute attribute = new Attribute(
@@ -606,8 +606,8 @@ public class CSVContentProvider extends AbstractContentProvider {
 									if (attribute.trim().startsWith("\"")
 											&& attribute.trim().endsWith("\"")) {
 										attribute = attribute.substring(1,
-												attribute.length() - 1);
-										attribute.replace("\"\"", "\"");
+												attribute.length() - 1)
+												.replace("\"\"", "\"");
 									}
 
 									attributes[i] = attribute.toUpperCase()
