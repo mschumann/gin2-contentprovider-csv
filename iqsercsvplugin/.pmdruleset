@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ruleset xmlns="http://pmd.sf.net/ruleset/1.0.0" name="M2Eclipse PMD RuleSet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd" xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd">
+   <description/>
+   <exclude-pattern>.*C:/Users/kbudisantoso/workspace/iqsercsvplugin/src/test/java.*</exclude-pattern>
+   <exclude-pattern>.*C:/Users/kbudisantoso/workspace/iqsercsvplugin/target.*</exclude-pattern>
+   <rule ref="rulesets/basic.xml"/>
+   <rule ref="rulesets/unusedcode.xml"/>
+   <rule ref="rulesets/imports.xml"/>
+</ruleset>
