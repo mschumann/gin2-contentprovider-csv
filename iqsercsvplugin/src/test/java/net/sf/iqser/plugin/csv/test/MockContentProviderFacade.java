@@ -6,12 +6,12 @@ import java.util.Iterator;
 
 import com.iqser.core.exception.IQserException;
 import com.iqser.core.model.Content;
-import com.iqser.core.plugin.ContentProviderFacade;
+import com.iqser.core.plugin.provider.ContentProviderFacade;
 
 public class MockContentProviderFacade implements ContentProviderFacade {
-	
+
 	private Collection<Content> contents = null;
-	
+
 	public MockContentProviderFacade() {
 		contents = new ArrayList<Content>();
 	}
@@ -20,36 +20,34 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		contents.add(arg0);
 	}
 
-	public Collection<Content> getExistingContents(String arg0)
-			throws IQserException {
-		
+	public Collection<Content> getExistingContents(String arg0) throws IQserException {
+
 		Collection<Content> col = new ArrayList<Content>();
 		col.addAll(contents);
-		
+
 		return col;
 	}
 
-	public boolean isExistingContent(String arg0, String arg1)
-			throws IQserException {
+	public boolean isExistingContent(String arg0, String arg1) throws IQserException {
 		Iterator<Content> cIter = contents.iterator();
-		
+
 		while (cIter.hasNext()) {
 			Content c = (Content) cIter.next();
-			
+
 			if (c.getContentUrl().equalsIgnoreCase(arg1)) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
 	public void removeContent(String arg0, String arg1) throws IQserException {
 		Iterator<Content> cIter = contents.iterator();
-		
+
 		while (cIter.hasNext()) {
 			Content c = (Content) cIter.next();
-			
+
 			if (c.getContentUrl().equalsIgnoreCase(arg1)) {
 				contents.remove(c);
 				break;
@@ -59,10 +57,10 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 
 	public void updateContent(Content arg0) throws IQserException {
 		Iterator<Content> cIter = contents.iterator();
-		
+
 		while (cIter.hasNext()) {
 			Content c = (Content) cIter.next();
-			
+
 			if (c.getContentUrl().equalsIgnoreCase(arg0.getContentUrl())) {
 				contents.remove(c);
 				contents.add(arg0);

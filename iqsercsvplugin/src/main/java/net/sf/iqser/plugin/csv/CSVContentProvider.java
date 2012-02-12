@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
@@ -40,7 +40,7 @@ import com.iqser.core.event.Event;
 import com.iqser.core.exception.IQserException;
 import com.iqser.core.model.Attribute;
 import com.iqser.core.model.Content;
-import com.iqser.core.plugin.AbstractContentProvider;
+import com.iqser.core.plugin.provider.AbstractContentProvider;
 
 /**
  * Content provider demonstrating how to access CSV files. It should be part of
@@ -51,9 +51,6 @@ import com.iqser.core.plugin.AbstractContentProvider;
  * 
  */
 public class CSVContentProvider extends AbstractContentProvider {
-
-	/** The version */
-	private static final long serialVersionUID = 8731808215080456476L;
 
 	/** The logger. */
 	private static Logger logger = Logger.getLogger(CSVContentProvider.class);
@@ -138,8 +135,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 	 */
 	@Override
 	public Collection<Content> getExistingContents() {
-		logger.info(String.format("Invoking %s#getExistingContents() ...", this
-				.getClass().getSimpleName()));
+		logger.info(String.format("Invoking %s#getExistingContents() ...", this.getClass().getSimpleName()));
 
 		Set<Content> returnCollection = new HashSet<Content>();
 
@@ -150,9 +146,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 				}
 			}
 		} catch (IQserException e) {
-			logger.error(
-					"Error occured while trying to get all existing content objects!",
-					e);
+			logger.error("Error occured while trying to get all existing content objects!", e);
 		}
 
 		return returnCollection;
@@ -177,14 +171,12 @@ public class CSVContentProvider extends AbstractContentProvider {
 	 */
 	@Override
 	public void init() {
-		logger.info(String.format("Invoking %s#init() ...", this.getClass()
-				.getSimpleName()));
+		logger.info(String.format("Invoking %s#init() ...", this.getClass().getSimpleName()));
 
 		this.settings = getInitParams();
 
 		// Setting the file's name.
-		String filename = this.settings.getProperty(CSV_PROPERTY_FILE, "")
-				.trim();
+		String filename = this.settings.getProperty(CSV_PROPERTY_FILE, "").trim();
 		if ("".equals(filename)) {
 			filename = this.settings.getProperty(CSV_PROPERTY_FILE_OBSOLETE);
 			if (null == filename || "".equals(filename.trim())) {
@@ -200,8 +192,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 			try {
 				fileUri = new URI(filename);
 				logger.info("CSV filename: " + filename);
-				logger.info("URI of CSV file: " + fileUri
-						+ ". URI is absolute? " + fileUri.isAbsolute());
+				logger.info("URI of CSV file: " + fileUri + ". URI is absolute? " + fileUri.isAbsolute());
 			} catch (URISyntaxException e) {
 				if (logger.isDebugEnabled()) {
 					logger.warn(filename + " is no vaild URI.", e);
@@ -218,72 +209,59 @@ public class CSVContentProvider extends AbstractContentProvider {
 		}
 
 		// Setting the file's delimeter.
-		this.delimeter = this.settings
-				.getProperty(CSV_PROPERTY_DELIMETER, CSV_DEFAULT_DELIMETER)
-				.trim().charAt(0);
+		this.delimeter = this.settings.getProperty(CSV_PROPERTY_DELIMETER, CSV_DEFAULT_DELIMETER).trim().charAt(0);
 
 		// Setting the file's charset.
-		String charsetProperty = this.settings.getProperty(
-				CSV_PROPERTY_CHARSET, CSV_DEFAULT_CHARSET);
+		String charsetProperty = this.settings.getProperty(CSV_PROPERTY_CHARSET, CSV_DEFAULT_CHARSET);
 		try {
 			this.charset = Charset.forName(charsetProperty);
 		} catch (IllegalCharsetNameException e) {
 			this.charset = Charset.defaultCharset();
-			logger.warn(String
-					.format("'%s' is an illegal chaset name. Default charset (%s) of the JVM will be used.",
-							charsetProperty, charset.displayName()));
+			logger.warn(String.format("'%s' is an illegal chaset name. Default charset (%s) of the JVM will be used.",
+					charsetProperty, charset.displayName()));
 		}
 
 		// Setting the zero-based list of numbers of the id-columns.
-		String idColumnsProperty = this.settings
-				.getProperty(CSV_PROPERTY_IDCOLUMNS);
+		String idColumnsProperty = this.settings.getProperty(CSV_PROPERTY_IDCOLUMNS);
 		if (null == idColumnsProperty || "".equals(idColumnsProperty.trim())) {
-			idColumnsProperty = this.settings.getProperty(
-					CSV_PROPERTY_IDCOLUMN, CSV_DEFAULT_IDCOLUMN);
+			idColumnsProperty = this.settings.getProperty(CSV_PROPERTY_IDCOLUMN, CSV_DEFAULT_IDCOLUMN);
 		}
 		String[] idColumnStrings = idColumnsProperty.split(",");
 		this.idColumns = new ArrayList<Integer>();
 		for (int i = 0; i < idColumnStrings.length; i++) {
 			try {
-				if (!(null == idColumnStrings[i] || ""
-						.equals(idColumnStrings[i].trim()))) {
-					this.idColumns.add(i,
-							Integer.parseInt(idColumnStrings[i].trim()));
+				if (!(null == idColumnStrings[i] || "".equals(idColumnStrings[i].trim()))) {
+					this.idColumns.add(i, Integer.parseInt(idColumnStrings[i].trim()));
 				}
 			} catch (NumberFormatException e) {
-				logger.error("Could not identify id column for value: '"
-						+ idColumnStrings[i]
+				logger.error("Could not identify id column for value: '" + idColumnStrings[i]
 						+ "'\nList of id columns is corrupted!", e);
 				throw e;
 			}
 		}
 
 		// Setting the boolean idAsContentUrl-flag.
-		this.idAsContentUrl = Boolean.parseBoolean(settings.getProperty(
-				CSV_PROPERTY_IDASCONTENTURL, CSV_DEFAULT_IDASCONTENTURL));
+		this.idAsContentUrl = Boolean.parseBoolean(settings.getProperty(CSV_PROPERTY_IDASCONTENTURL,
+				CSV_DEFAULT_IDASCONTENTURL));
 
 		// Setting the zero-based number of the fulltext-column.
-		this.fulltextColumn = Integer.parseInt(this.settings.getProperty(
-				CSV_PROPERTY_FULLTEXTCOLUMN, CSV_DEFAULT_FULLTEXTCOLUMN));
+		this.fulltextColumn = Integer.parseInt(this.settings.getProperty(CSV_PROPERTY_FULLTEXTCOLUMN,
+				CSV_DEFAULT_FULLTEXTCOLUMN));
 
 		// Setting the zero-based number of the fulltext-column.
-		this.nameColumn = Integer.parseInt(this.settings.getProperty(
-				CSV_PROPERTY_NAMECOLUMN, CSV_DEFAULT_NAMECOLUMN));
+		this.nameColumn = Integer.parseInt(this.settings.getProperty(CSV_PROPERTY_NAMECOLUMN, CSV_DEFAULT_NAMECOLUMN));
 
 		// Setting the key columns.
-		String[] keyColumnStrings = this.settings.getProperty(
-				CSV_PROPERTY_KEYCOLUMNS, CSV_DEFAULT_KEYCOLUMNS).split(",");
+		String[] keyColumnStrings = this.settings.getProperty(CSV_PROPERTY_KEYCOLUMNS, CSV_DEFAULT_KEYCOLUMNS).split(
+				",");
 		this.keyColumns = new ArrayList<Integer>();
 		for (int i = 0; i < keyColumnStrings.length; i++) {
 			try {
-				if (!(null == keyColumnStrings[i] || ""
-						.equals(keyColumnStrings[i].trim()))) {
-					this.keyColumns.add(i,
-							Integer.parseInt(keyColumnStrings[i].trim()));
+				if (!(null == keyColumnStrings[i] || "".equals(keyColumnStrings[i].trim()))) {
+					this.keyColumns.add(i, Integer.parseInt(keyColumnStrings[i].trim()));
 				}
 			} catch (NumberFormatException e) {
-				logger.error("Could not identify key column for value: '"
-						+ keyColumnStrings[i]
+				logger.error("Could not identify key column for value: '" + keyColumnStrings[i]
 						+ "'\nList of key columns is corrupted!", e);
 				throw e;
 			}
@@ -291,20 +269,16 @@ public class CSVContentProvider extends AbstractContentProvider {
 
 		// Setting the columns that will be ignored while creating the content
 		// objects.
-		String[] ignoreColumnStrings = this.settings.getProperty(
-				CSV_PROPERTY_IGNORECOLUMNS, CSV_DEFAULT_IGNORECOLUMNS).split(
-				",");
+		String[] ignoreColumnStrings = this.settings.getProperty(CSV_PROPERTY_IGNORECOLUMNS, CSV_DEFAULT_IGNORECOLUMNS)
+				.split(",");
 		this.ignoreColumns = new ArrayList<Integer>();
 		for (int i = 0; i < ignoreColumnStrings.length; i++) {
 			try {
-				if (null != ignoreColumnStrings[i]
-						&& !"".equals(ignoreColumnStrings[i].trim())) {
-					this.ignoreColumns.add(i,
-							Integer.parseInt(ignoreColumnStrings[i].trim()));
+				if (null != ignoreColumnStrings[i] && !"".equals(ignoreColumnStrings[i].trim())) {
+					this.ignoreColumns.add(i, Integer.parseInt(ignoreColumnStrings[i].trim()));
 				}
 			} catch (NumberFormatException e) {
-				logger.error("Could not identify key column for value: '"
-						+ ignoreColumnStrings[i]
+				logger.error("Could not identify key column for value: '" + ignoreColumnStrings[i]
 						+ "'\nList of key columns is incomplete!", e);
 				throw e;
 			}
@@ -335,9 +309,8 @@ public class CSVContentProvider extends AbstractContentProvider {
 	 * @see com.iqser.core.plugin.AbstractContentProvider#doSynchrinization()
 	 */
 	@Override
-	public void doSynchonization() {
-		logger.info(String.format("Invoking %s#doSynchronization() ...", this
-				.getClass().getSimpleName()));
+	public void doSynchronization() {
+		logger.info(String.format("Invoking %s#doSynchronization() ...", this.getClass().getSimpleName()));
 
 		Collection<? extends String> contentUrls = getContentUrls();
 		if (this.modified) {
@@ -354,9 +327,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 					Thread.sleep(100);
 				} catch (IQserException e) {
 					logger.error(
-							String.format(
-									"Unexpected error while trying to add or update content: %s",
-									contentUrl), e);
+							String.format("Unexpected error while trying to add or update content: %s", contentUrl), e);
 				} catch (InterruptedException e) {
 					logger.warn("Could not sleep well :(");
 				}
@@ -371,8 +342,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 	 */
 	@Override
 	public void doHousekeeping() {
-		logger.info(String.format("Invoking %s#doHousekeeping() ...", this
-				.getClass().getSimpleName()));
+		logger.info(String.format("Invoking %s#doHousekeeping() ...", this.getClass().getSimpleName()));
 
 		Collection<? extends String> contentUrls = getContentUrls();
 		for (String existingContentUrl : getExistingContentUrls()) {
@@ -381,9 +351,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 					removeContent(existingContentUrl);
 				} catch (IQserException e) {
 					logger.error(
-							String.format(
-									"Unexpected error while trying to delete content: %s",
-									existingContentUrl), e);
+							String.format("Unexpected error while trying to delete content: %s", existingContentUrl), e);
 				}
 			}
 		}
@@ -396,8 +364,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 	 */
 	@Override
 	public Content getContent(String contentUrl) {
-		logger.info(String.format("Invoking %s#getContent(String url) ...",
-				this.getClass().getSimpleName()));
+		logger.info(String.format("Invoking %s#getContent(String url) ...", this.getClass().getSimpleName()));
 		if (0 == contentMap.size()) {
 			this.getContentUrls();
 		}
@@ -413,8 +380,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 	 * .Content)
 	 */
 	public byte[] getBinaryData(Content c) {
-		logger.info(String.format("Invoking %s#getBinaryData(Content c) ...",
-				this.getClass().getSimpleName()));
+		logger.info(String.format("Invoking %s#getBinaryData(Content c) ...", this.getClass().getSimpleName()));
 
 		return c.getFulltext().getBytes();
 	}
@@ -453,27 +419,22 @@ public class CSVContentProvider extends AbstractContentProvider {
 	 */
 	@Override
 	public Collection<String> getContentUrls() {
-		logger.info(String.format("Invoking %s#getContentUrls() ...", this
-				.getClass().getSimpleName()));
+		logger.info(String.format("Invoking %s#getContentUrls() ...", this.getClass().getSimpleName()));
 
-		if (null != this.file && this.file.exists() && this.file.isFile()
-				&& this.file.canRead()) {
+		if (null != this.file && this.file.exists() && this.file.isFile() && this.file.canRead()) {
 			logger.info("Reading CSV file: " + this.file.toURI().toString());
 
-			if (this.contentMap.isEmpty()
-					|| this.modificationTimestamp < this.file.lastModified()) {
+			if (this.contentMap.isEmpty() || this.modificationTimestamp < this.file.lastModified()) {
 				this.modificationTimestamp = this.file.lastModified();
 				this.modified = true;
 				this.contentMap.clear();
 
 				CsvReader csvReader = null;
 				try {
-					csvReader = new CsvReader(new InputStreamReader(
-							new FileInputStream(this.file), this.charset),
+					csvReader = new CsvReader(new InputStreamReader(new FileInputStream(this.file), this.charset),
 							delimeter);
 				} catch (FileNotFoundException e) {
-					logger.error("Could not read file: " + this.file.getPath(),
-							e);
+					logger.error("Could not read file: " + this.file.getPath(), e);
 					return this.contentMap.keySet();
 				}
 
@@ -489,111 +450,73 @@ public class CSVContentProvider extends AbstractContentProvider {
 							content.setModificationDate(modificationTimestamp);
 
 							if (logger.isDebugEnabled()) {
-								logger.debug(String
-										.format("Building content object of type '%s'.",
-												this.getType()));
+								logger.debug(String.format("Building content object of type '%s'.", this.getType()));
 							}
 
 							for (int i = 0; i < columnCount; i++) {
-								if (null == attributes[i]
-										|| "".equals(attributes[i].trim())) {
+								if (null == attributes[i] || "".equals(attributes[i].trim())) {
 									// skip this column
 									continue;
 								}
 
 								String attributeValue = csvReader.get(i).trim();
 								if (logger.isDebugEnabled()) {
-									logger.debug(String
-											.format("\tBuilding attribute object - %s = %s",
-													attributes[i],
-													attributeValue));
+									logger.debug(String.format("\tBuilding attribute object - %s = %s", attributes[i],
+											attributeValue));
 								}
 
 								// removing quotes at the beginning and at
 								// the end
-								if (attributeValue.startsWith("\"")
-										&& attributeValue.endsWith("\"")) {
-									attributeValue = attributeValue.substring(
-											1, attributeValue.length() - 1)
-											.replace("\"\"", "\"");
+								if (attributeValue.startsWith("\"") && attributeValue.endsWith("\"")) {
+									attributeValue = attributeValue.substring(1, attributeValue.length() - 1).replace(
+											"\"\"", "\"");
 								}
 
-								Attribute attribute = new Attribute(
-										attributes[i], attributeValue,
-										Attribute.ATTRIBUTE_TYPE_TEXT,
-										this.keyColumns.contains(Integer
-												.valueOf(i)));
+								Attribute attribute = new Attribute(attributes[i], attributeValue,
+										Attribute.ATTRIBUTE_TYPE_TEXT, this.keyColumns.contains(Integer.valueOf(i)));
 
-								if (this.idColumns.contains(Integer.valueOf(i))
-										&& null != attribute.getValue()
-										&& !"".equals(attribute.getValue()
-												.trim())) {
-									if (1 == this.idColumns.size()
-											&& this.idAsContentUrl) {
-										content.setContentUrl(attribute
-												.getValue());
+								if (this.idColumns.contains(Integer.valueOf(i)) && null != attribute.getValue()
+										&& !"".equals(attribute.getValue().trim())) {
+									if (1 == this.idColumns.size() && this.idAsContentUrl) {
+										content.setContentUrl(attribute.getValue());
 									} else if (null == content.getContentUrl()
-											|| "".equals(content
-													.getContentUrl().trim())) {
+											|| "".equals(content.getContentUrl().trim())) {
 										content.setContentUrl(CSV_CONTENT_URI_BASE
-												+ URLEncoder.encode(this
-														.getType()
-														.toLowerCase(),
-														"ISO-8859-1")
+												+ URLEncoder.encode(this.getType().toLowerCase(), "ISO-8859-1")
 
-												+ "/"
-												+ URLEncoder.encode(
-														attribute.getValue(),
-														"ISO-8859-1"));
+												+ "/" + URLEncoder.encode(attribute.getValue(), "ISO-8859-1"));
 									} else {
-										content.setContentUrl(content
-												.getContentUrl()
-												.concat("/"
-														+ URLEncoder.encode(
-																attribute
-																		.getValue(),
-																"ISO-8859-1")));
+										content.setContentUrl(content.getContentUrl().concat(
+												"/" + URLEncoder.encode(attribute.getValue(), "ISO-8859-1")));
 									}
 								}
 
 								String fulltext = null;
 								if (i == this.fulltextColumn) {
 									fulltext = attribute.getValue();
-								} else if (!this.ignoreColumns.contains(Integer
-										.valueOf(i))
-										&& null != attribute.getValue()
-										&& !"".equals(attribute.getValue()
-												.trim())) {
+								} else if (!this.ignoreColumns.contains(Integer.valueOf(i))
+										&& null != attribute.getValue() && !"".equals(attribute.getValue().trim())) {
 									// empty attributes, the fulltext
 									// attribute (if present) and those that
 									// should be ignored are not added to
 									// the content object
-									Attribute existingAttribute = content
-											.getAttributeByName(attribute
-													.getName());
+									Attribute existingAttribute = content.getAttributeByName(attribute.getName());
 									if (null != existingAttribute) {
-										existingAttribute.addValue(attribute
-												.getValue());
+										existingAttribute.addValue(attribute.getValue());
 									} else {
 										content.addAttribute(attribute);
 									}
 								}
 
-								if (i == this.nameColumn
-										&& null != attributeValue
-										&& !"".equals(attributeValue)
-										&& null == content
-												.getAttributeByName("NAME")) {
-									content.addAttribute(new Attribute("NAME",
-											attributeValue,
-											Attribute.ATTRIBUTE_TYPE_TEXT,
-											false));
+								if (i == this.nameColumn && null != attributeValue && !"".equals(attributeValue)
+										&& null == content.getAttributeByName("NAME")) {
+									content.addAttribute(new Attribute("NAME", attributeValue,
+											Attribute.ATTRIBUTE_TYPE_TEXT, false));
 								}
 
 								if (null == fulltext) {
 									// take the whole row as fulltext
-									fulltext = csvReader.getRawRecord()
-											.replace(';', ' ');
+									fulltext = csvReader.getRawRecord().replace(';', ' ');
 								}
 
 								if (null != fulltext) {
@@ -617,66 +540,43 @@ public class CSVContentProvider extends AbstractContentProvider {
 							attributes = new String[columnCount];
 							for (int i = 0; i < columnCount; i++) {
 								String attribute = csvReader.get(i);
-								if (null != attribute
-										&& !"".equals(attribute.trim())) {
+								if (null != attribute && !"".equals(attribute.trim())) {
 									attribute = attribute.trim();
 
 									// removing quotes at the beginning and
 									// at the end
-									if (attribute.trim().startsWith("\"")
-											&& attribute.trim().endsWith("\"")) {
-										attribute = attribute.substring(1,
-												attribute.length() - 1)
+									if (attribute.trim().startsWith("\"") && attribute.trim().endsWith("\"")) {
+										attribute = attribute.substring(1, attribute.length() - 1)
 												.replace("\"\"", "\"");
 									}
 
-									attributes[i] = attribute.toUpperCase()
-											.replace("\u00C4", "AE")
-											.replace("\u00D6", "OE")
-											.replace("\u00DC", "UE")
-											.replace("\u00DF", "SS")
-											.replace("\"", " ").trim()
-											.replace("  ", " ")
-											.replace(' ', '_');
+									attributes[i] = attribute.toUpperCase().replace("\u00C4", "AE")
+											.replace("\u00D6", "OE").replace("\u00DC", "UE").replace("\u00DF", "SS")
+											.replace("\"", " ").trim().replace("  ", " ").replace(' ', '_');
 
 									// support former configuration syntax
-									if (null == this.settings
-											.getProperty(CSV_PROPERTY_IDCOLUMNS)
-											&& null == this.settings
-													.getProperty(CSV_PROPERTY_IDCOLUMN)) {
-										String idColumnProperty = this.settings
-												.getProperty(
-														CSV_PROPERTY_IDCOLUMN_OBSOLETE,
-														"").trim();
-										if (!"".equals(idColumnProperty)
-												&& attribute
-														.equals(idColumnProperty)) {
+									if (null == this.settings.getProperty(CSV_PROPERTY_IDCOLUMNS)
+											&& null == this.settings.getProperty(CSV_PROPERTY_IDCOLUMN)) {
+										String idColumnProperty = this.settings.getProperty(
+												CSV_PROPERTY_IDCOLUMN_OBSOLETE, "").trim();
+										if (!"".equals(idColumnProperty) && attribute.equals(idColumnProperty)) {
 											this.idColumns.clear();
-											this.idColumns.add(Integer
-													.valueOf(i));
+											this.idColumns.add(Integer.valueOf(i));
 											this.idAsContentUrl = true;
 										}
 									}
 
 									// support former configuration syntax
-									if (null == this.settings
-											.getProperty(CSV_PROPERTY_KEYCOLUMNS)) {
-										String keyColumnsProperty = this.settings
-												.getProperty(
-														CSV_PROPERTY_KEYCOLUMNS_OBSOLETE,
-														"").trim();
+									if (null == this.settings.getProperty(CSV_PROPERTY_KEYCOLUMNS)) {
+										String keyColumnsProperty = this.settings.getProperty(
+												CSV_PROPERTY_KEYCOLUMNS_OBSOLETE, "").trim();
 										if (!"".equals(keyColumnsProperty)
-												&& keyColumnsProperty
-														.contains("["
-																+ attribute
-																+ "]")) {
+												&& keyColumnsProperty.contains("[" + attribute + "]")) {
 											if (keyColumnCompatibilityMode) {
-												keyColumns.add(Integer
-														.valueOf(i));
+												keyColumns.add(Integer.valueOf(i));
 											} else {
 												keyColumns.clear();
-												keyColumns.add(Integer
-														.valueOf(i));
+												keyColumns.add(Integer.valueOf(i));
 												keyColumnCompatibilityMode = true;
 											}
 										}
@@ -686,8 +586,7 @@ public class CSVContentProvider extends AbstractContentProvider {
 						} // end else
 					} // end while
 				} catch (IOException e) {
-					logger.error("Error occured while reading file: "
-							+ CSV_PROPERTY_FILE, e);
+					logger.error("Error occured while reading file: " + CSV_PROPERTY_FILE, e);
 				} finally {
 					csvReader.close();
 				}
@@ -700,28 +599,21 @@ public class CSVContentProvider extends AbstractContentProvider {
 
 	}
 
-	/**
-	 * Deprecated method to use other plugins if a content object contains sub
-	 * content .
-	 * 
-	 * @see com.iqser.core.plugin.AbstractContentProvider#getContent(java.io.InputStream)
-	 */
 	@Override
-	@Deprecated
-	public Content getContent(InputStream arg0) {
-		throw new NotImplementedException();
+	public void performAction(String arg0, Hashtable<String, String> arg1, Content arg2) {
+		// Nothing to be done
 	}
 
-	/**
-	 * Deprecated methods to use in case of using events of other plugins for
-	 * exmplae an email containing a csv file
-	 * 
-	 * @see com.iqser.core.plugin.AbstractContentProvider#onChangeEvent(com.iqser.core.event.Event)
-	 */
 	@Override
-	@Deprecated
+	public Content getContent(InputStream arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public void onChangeEvent(Event arg0) {
-		// Nothing to be done
+		// TODO Auto-generated method stub
+
 	}
 
 }

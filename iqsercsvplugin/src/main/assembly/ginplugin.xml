@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ginplugin
+	xsi:schemaLocation="http://www.iqser.com/schema/ginplugin/2.0 http://www.iqser.com/schema/ginplugin/2.0/ginplugin.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.iqser.com/schema/ginplugin/2.0">
+
+	<name>CSV Content Provider</name>
+	<vendor>iQser GmbH</vendor>
+	<version>2.0-SNAPSHOT</version>
+
+	<description>
+		This ContentProvider plugin is able to connect to a file repository 
+		with CMIS support and provided files as Content objects to the iQser GIN Server.
+	</description>
+
+	<classname type="ContentProvider">
+		<!-- full qualified class name -->
+		net.sf.iqser.plugin.csv.CsvContentProvider
+	</classname>
+
+	<params>
+		<param name="file" type="String" optional="false">
+			Path to the CSV file.
+		</param>
+		<param name="delimeter" type="String" optional="true">
+			Delimeter of the CSV file; 
+			default is ';'
+		</param>
+		<param name="charset" type="String" optional="true">
+			Charset of the CSV file; 
+			default is 'UTF-8'
+		</param>
+		<param name="columns.id" type="String" optional="true">
+			Comma seperated list of zero based numbers of the ID-columns; 
+			default is '0'
+		</param>
+		<param name="column.idAsContentUrl" type="String" optional="true">
+			If true and if there is only a single ID column, the ID column will be used as ContentUrl;
+			default is 'false'
+			Example of an generated ContentUrl:
+				iqser://iqsercsvplugin.sf.net/[TYPE]/[ID-COLUMN-VALUE-1]/[ID-COLUMN-VALUE-2]/[...]
+		</param>
+		<param name="column.fulltext" type="String" optional="true">
+			Zero based number of the column that should be used as fulltext;
+			default is '-1'
+			which means that the whole row without delimeters is used as fulltext
+		</param>
+		<param name="columns.key" type="String" optional="true">
+			Comma seperated list of zero-based column numbers that will become key attributes;
+			default is null (empty)
+		</param>
+		<param name="columns.ignore" type="String" optional="true">
+			Comma seperated list of zero-based column numbers that will be ignored;
+			default is null (empty)
+		</param>
+	</params>
+</ginplugin>

@@ -1,0 +1,28 @@
+<assembly>
+	<id>plugin</id>
+	
+	<formats>
+		<format>zip</format>
+	</formats>
+	
+	<baseDirectory>${basedir}</baseDirectory>
+	
+	<files>
+		<file>
+			<source>src/main/assembly/ginplugin.xml</source>
+			<destName>ginplugin.xml</destName>
+		</file>
+		<file>
+			<source>target/${project.artifactId}-${project.version}.jar</source>
+			<destName>${project.artifactId}-${project.version}.jar</destName>
+		</file>
+	</files>
+	
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib</outputDirectory>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useProjectArtifact>false</useProjectArtifact>
+		</dependencySet>
+	</dependencySets>
+</assembly>
