@@ -5,7 +5,7 @@
 		<type>CSV</type>
 		<name>CSV Plugin</name>
 		<vendor>IQser Technologies GmbH</vendor>
-		<provider-class> net.sf.iqser.plugin.csv.CSVContentProvider
+		<provider-class> net.sf.iqser.plugin.csv.CsvContentProvider
 		</provider-class>
 
 		<!-- Required initialization-parameters -->
