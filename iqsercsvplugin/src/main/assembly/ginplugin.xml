@@ -18,6 +18,9 @@
 	</classname>
 
 	<params>
+		<param name="content.type" type="String" optional="true">
+			The type of the content object.
+		</param>
 		<param name="file" type="String" optional="false">
 			Path to the CSV file.
 		</param>
