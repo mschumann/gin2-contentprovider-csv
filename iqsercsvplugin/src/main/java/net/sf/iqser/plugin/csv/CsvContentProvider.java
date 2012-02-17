@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +38,7 @@ import com.iqser.core.event.Event;
 import com.iqser.core.exception.IQserException;
 import com.iqser.core.model.Attribute;
 import com.iqser.core.model.Content;
+import com.iqser.core.model.Parameter;
 import com.iqser.core.plugin.provider.AbstractContentProvider;
 
 /**
@@ -599,7 +599,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	}
 
 	@Override
-	public void performAction(String arg0, Hashtable<String, String> arg1, Content arg2) {
+	public void performAction(String arg0, Collection<Parameter> arg1, Content arg2) {
 		// Nothing to be done
 	}
 
