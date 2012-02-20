@@ -7,11 +7,11 @@
 	<artifactId>iqsercsvplugin</artifactId>
 	<version>2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	
+
 	<name>CSV ContentProvider for iQser GIN</name>
 	<description>The goal of this project is to provide a ContentProvider plugin for CSV files for iQser GIN Semantic Middleware (www.iqser.com).</description>
 	<url>http://iqsercsvplugin.sourceforge.net</url>
-	
+
 	<licenses>
 		<license>
 			<name>Apache 2</name>
@@ -25,7 +25,7 @@
 		<system>Sourceforge Tracker</system>
 		<url>https://sourceforge.net/tracker/?group_id=563210&amp;atid=2284622</url>
 	</issueManagement>
-	
+
 	<scm>
 		<connection>
 			scm:svn:http://iqsercsvplugin.sourceforge.net/viewvc/iqsercsvplugin/trunk
@@ -59,15 +59,15 @@
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
+
+
 		<developer>
 			<id>tantusch</id>
 			<name>Tim Antusch</name>
@@ -152,7 +152,7 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>iqsercsvplugin-repo</id>
@@ -175,7 +175,7 @@
 			<url>sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs</url>
 		</site>
 	</distributionManagement>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -354,9 +354,7 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-								<copy
-									file="${project.build.directory}/${project.build.finalName}.zip"
-									tofile="${project.build.directory}/${project.build.finalName}.gin" />
+								<copy file="${project.build.directory}/${project.build.finalName}.zip" tofile="${project.build.directory}/${project.build.finalName}.gin" />
 							</target>
 						</configuration>
 						<goals>
@@ -388,8 +386,7 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<scp todir="${sourceforge.upload}" password="${sf.password}"
-									trust="true">
+								<scp todir="${sourceforge.upload}" password="${sf.password}" trust="true">
 									<fileset dir="${project.build.directory}">
 										<include name="${project.build.finalName}*.gin" />
 									</fileset>
@@ -414,7 +411,7 @@
 		</extensions>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -523,6 +520,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.iqser.core</groupId>
+			<artifactId>iqser-core-test</artifactId>
+			<version>${iqser.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
@@ -538,6 +541,12 @@
 			<groupId>net.sourceforge.javacsv</groupId>
 			<artifactId>javacsv</artifactId>
 			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>jmock</groupId>
+			<artifactId>jmock</artifactId>
+			<version>1.1.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
