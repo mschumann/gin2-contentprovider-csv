@@ -34,7 +34,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
-import com.iqser.core.event.Event;
 import com.iqser.core.exception.IQserException;
 import com.iqser.core.model.Attribute;
 import com.iqser.core.model.Content;
@@ -414,7 +413,6 @@ public class CsvContentProvider extends AbstractContentProvider {
 	 * 
 	 * @see com.iqser.core.plugin.AbstractContentProvider#getContentUrls()
 	 */
-	@Override
 	public Collection<String> getContentUrls() {
 		LOG.info(String.format("Invoking %s#getContentUrls() ...", this.getClass().getSimpleName()));
 
@@ -607,12 +605,6 @@ public class CsvContentProvider extends AbstractContentProvider {
 	public Content getContent(InputStream arg0) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void onChangeEvent(Event arg0) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
