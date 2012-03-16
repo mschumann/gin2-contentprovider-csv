@@ -32,7 +32,7 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		Iterator<Content> cIter = contents.iterator();
 
 		while (cIter.hasNext()) {
-			Content c = (Content) cIter.next();
+			Content c = cIter.next();
 
 			if (c.getContentUrl().equalsIgnoreCase(arg1)) {
 				return true;
@@ -46,7 +46,7 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		Iterator<Content> cIter = contents.iterator();
 
 		while (cIter.hasNext()) {
-			Content c = (Content) cIter.next();
+			Content c = cIter.next();
 
 			if (c.getContentUrl().equalsIgnoreCase(arg1)) {
 				contents.remove(c);
@@ -59,7 +59,7 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		Iterator<Content> cIter = contents.iterator();
 
 		while (cIter.hasNext()) {
-			Content c = (Content) cIter.next();
+			Content c = cIter.next();
 
 			if (c.getContentUrl().equalsIgnoreCase(arg0.getContentUrl())) {
 				contents.remove(c);
@@ -67,5 +67,10 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 				break;
 			}
 		}
+	}
+
+	public Content getExistingContent(String arg0, String arg1) throws IQserException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
