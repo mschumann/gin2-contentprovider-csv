@@ -59,15 +59,6 @@
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
-
-
-
-
-
-
-
-
-
 		<developer>
 			<id>tantusch</id>
 			<name>Tim Antusch</name>
@@ -354,12 +345,36 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-								<copy file="${project.build.directory}/${project.build.finalName}.zip" tofile="${project.build.directory}/${project.build.finalName}.gin" />
+								<copy
+									file="${project.build.directory}/${project.build.finalName}.zip"
+									tofile="${project.build.directory}/${project.build.finalName}.gin" />
 							</target>
 						</configuration>
 						<goals>
 							<goal>run</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>abc</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/${project.build.finalName}.gin</file>
+									<type>gin</type>
+								</artifact>
+							</artifacts>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -386,7 +401,8 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<scp todir="${sourceforge.upload}" password="${sf.password}" trust="true">
+								<scp todir="${sourceforge.upload}" password="${sf.password}"
+									trust="true">
 									<fileset dir="${project.build.directory}">
 										<include name="${project.build.finalName}*.gin" />
 									</fileset>
@@ -411,7 +427,8 @@
 		</extensions>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
