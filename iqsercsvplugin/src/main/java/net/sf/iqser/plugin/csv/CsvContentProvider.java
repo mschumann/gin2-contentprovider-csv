@@ -41,8 +41,8 @@ import com.iqser.core.model.Parameter;
 import com.iqser.core.plugin.provider.AbstractContentProvider;
 
 /**
- * Content provider demonstrating how to access CSV files. It should be part of
- * the file plugin package for a productive system.
+ * Content provider demonstrating how to access CSV files. It should be part of the file plugin package for a productive
+ * system.
  * 
  * @author Joerg Wurzer
  * @author Kresnadi Budisantoso
@@ -92,8 +92,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	private List<Integer> idColumns;
 
 	/*
-	 * If TRUE, the value of the ID column will be used as ContentUrl, else an
-	 * artificial URI will be generated.
+	 * If TRUE, the value of the ID column will be used as ContentUrl, else an artificial URI will be generated.
 	 */
 	private boolean idAsContentUrl;
 
@@ -284,8 +283,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	}
 
 	/**
-	 * Optional method if any additional process is required to stop the
-	 * provider
+	 * Optional method if any additional process is required to stop the provider
 	 * 
 	 * @see com.iqser.core.plugin.AbstractContentProvider#destroy()
 	 */
@@ -295,8 +293,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	}
 
 	/**
-	 * Required method to add now or update modified content objects to the
-	 * repository
+	 * Required method to add now or update modified content objects to the repository
 	 * 
 	 * @see com.iqser.core.plugin.AbstractContentProvider#doSynchrinization()
 	 */
@@ -307,7 +304,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 		Collection<? extends String> contentUrls = getContentUrls();
 		if (this.modified) {
 			for (String contentUrl : contentUrls) {
-				Content content = getContent(contentUrl);
+				Content content = createContent(contentUrl);
 				try {
 					if (!isExistingContent(contentUrl)) {
 						addContent(content);
@@ -359,7 +356,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	 * @see com.iqser.core.plugin.AbstractContentProvider#getContent(java.lang.String)
 	 */
 	@Override
-	public Content getContent(String contentUrl) {
+	public Content createContent(String contentUrl) {
 		LOG.info(String.format("Invoking %s#getContent(String url) ...", this.getClass().getSimpleName()));
 		if (0 == contentMap.size()) {
 			this.getContentUrls();
@@ -368,12 +365,9 @@ public class CsvContentProvider extends AbstractContentProvider {
 	}
 
 	/*
-	 * A method to deliver the complete content object, for example to display
-	 * the content object
+	 * A method to deliver the complete content object, for example to display the content object
 	 * 
-	 * @see
-	 * com.iqser.core.plugin.ContentProvider#getBinaryData(com.iqser.core.model
-	 * .Content)
+	 * @see com.iqser.core.plugin.ContentProvider#getBinaryData(com.iqser.core.model .Content)
 	 */
 	public byte[] getBinaryData(Content c) {
 		LOG.info(String.format("Invoking %s#getBinaryData(Content c) ...", this.getClass().getSimpleName()));
@@ -393,11 +387,9 @@ public class CsvContentProvider extends AbstractContentProvider {
 	}
 
 	/**
-	 * Performs defined actions related a specing content object of this
-	 * provider
+	 * Performs defined actions related a specing content object of this provider
 	 * 
-	 * @see com.iqser.core.plugin.AbstractContentProvider#performAction(java.lang.String,
-	 *      com.iqser.core.model.Content)
+	 * @see com.iqser.core.plugin.AbstractContentProvider#performAction(java.lang.String, com.iqser.core.model.Content)
 	 */
 	@Override
 	public void performAction(String arg0, Content arg1) {
@@ -405,11 +397,9 @@ public class CsvContentProvider extends AbstractContentProvider {
 	}
 
 	/**
-	 * This method is used to retrieve identifiers for objects in the csv-file.
-	 * As it parses the CSV-file which is defined in an init-param of this
-	 * plugin to read the contentUrls, the content objects will also be created
-	 * "on the fly" and stored in memory. The file will only be parsed if its
-	 * modification timestamp has changed.
+	 * This method is used to retrieve identifiers for objects in the csv-file. As it parses the CSV-file which is
+	 * defined in an init-param of this plugin to read the contentUrls, the content objects will also be created
+	 * "on the fly" and stored in memory. The file will only be parsed if its modification timestamp has changed.
 	 * 
 	 * @see com.iqser.core.plugin.AbstractContentProvider#getContentUrls()
 	 */
@@ -602,7 +592,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	}
 
 	@Override
-	public Content getContent(InputStream arg0) {
+	public Content createContent(InputStream arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
