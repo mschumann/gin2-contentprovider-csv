@@ -62,6 +62,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	private static final String CSV_PROPERTY_NAMECOLUMN = "column.name";
 	private static final String CSV_PROPERTY_KEYCOLUMNS = "columns.key";
 	private static final String CSV_PROPERTY_IGNORECOLUMNS = "columns.ignore";
+	private static final String CSV_PROPERTY_TIMESTAMPCOLUMNS = "columns.type.timestamp";
 	private static final String CSV_PROPERTY_FULLTEXTCOLUMN = "column.fulltext";
 	private static final String CSV_PROPERTY_CONTENT_TYPE = "content.type";
 
@@ -77,6 +78,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	public static final String CSV_DEFAULT_KEYCOLUMNS = "";
 	public static final String CSV_DEFAULT_NAMECOLUMN = "-1";
 	public static final String CSV_DEFAULT_IGNORECOLUMNS = "";
+	public static final String CSV_DEFAULT_TIMESTAMPCOLUMNS = "";
 	public static final String CSV_DEFAULT_FULLTEXTCOLUMN = "-1";
 	public static final String CSV_DEFAULT_TYPE = "CSV Data";
 
@@ -122,6 +124,9 @@ public class CsvContentProvider extends AbstractContentProvider {
 	private Charset charset;
 
 	private String contentType;
+
+	/* Zero-based list of columns that contains timestamps. */
+	private List<Integer> timestampColumns;
 
 	/**
 	 * The last synchronization
@@ -238,6 +243,24 @@ public class CsvContentProvider extends AbstractContentProvider {
 		this.nameColumn = Integer
 				.parseInt(getInitParams().getProperty(CSV_PROPERTY_NAMECOLUMN, CSV_DEFAULT_NAMECOLUMN));
 		LOG.debug("Init param: nameColumn = " + nameColumn);
+
+		// Setting the timestamp columns' type.
+		String timestampColumnParamValue = getInitParams().getProperty(CSV_PROPERTY_TIMESTAMPCOLUMNS,
+				CSV_DEFAULT_TIMESTAMPCOLUMNS);
+		String[] timestampColumnStrings = timestampColumnParamValue.split(",");
+		this.keyColumns = new ArrayList<Integer>();
+		for (int i = 0; i < timestampColumnStrings.length; i++) {
+			try {
+				if (!(null == timestampColumnStrings[i] || "".equals(timestampColumnStrings[i].trim()))) {
+					this.timestampColumns.add(i, Integer.parseInt(timestampColumnStrings[i].trim()));
+				}
+			} catch (NumberFormatException e) {
+				LOG.error("Could not identify key column for value: '" + timestampColumnStrings[i]
+						+ "'\nList of key columns is corrupted!", e);
+				throw e;
+			}
+		}
+		LOG.debug("Init param: columns.type.date = " + timestampColumnStrings);
 
 		// Setting the key columns.
 		String keyColumnParamValue = getInitParams().getProperty(CSV_PROPERTY_KEYCOLUMNS, CSV_DEFAULT_KEYCOLUMNS);
@@ -457,8 +480,15 @@ public class CsvContentProvider extends AbstractContentProvider {
 											"\"\"", "\"");
 								}
 
-								Attribute attribute = new Attribute(attributes[i], attributeValue,
-										Attribute.ATTRIBUTE_TYPE_TEXT, this.keyColumns.contains(Integer.valueOf(i)));
+								Attribute attribute = new Attribute();
+								attribute.setName(attributes[i]);
+								attribute.addValue(attributeValue);
+								if (this.timestampColumns.contains(Integer.valueOf(i))) {
+									attribute.setType(Attribute.ATTRIBUTE_TYPE_DATE);
+								} else {
+									attribute.setType(Attribute.ATTRIBUTE_TYPE_TEXT);
+								}
+								attribute.setKey(this.keyColumns.contains(Integer.valueOf(i)));
 
 								if (this.idColumns.contains(Integer.valueOf(i)) && null != attribute.getValue()
 										&& !"".equals(attribute.getValue().trim())) {

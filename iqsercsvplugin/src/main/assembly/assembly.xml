@@ -9,7 +9,7 @@
 	
 	<files>
 		<file>
-			<source>src/main/assembly/ginplugin.xml</source>
+			<source>target/generated-resources/ginplugin.xml</source>
 			<destName>ginplugin.xml</destName>
 		</file>
 		<file>
