@@ -366,7 +366,7 @@
 								<copy failonerror="true"
 									file="${basedir}/src/main/assembly/ginplugin.xml" tofile="${basedir}/target/generated-resources/ginplugin.xml" />
 								<replace file="${basedir}/target/generated-resources/ginplugin.xml"
-									token="###PROJECT_VERSION###" value="${project.version}" />
+									token="###VERSION###" value="${project.version}" />
 							</target>
 						</configuration>
 					</execution>
