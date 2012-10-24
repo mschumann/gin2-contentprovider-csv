@@ -465,6 +465,7 @@
 										</versionRange>
 										<goals>
 											<goal>cpd-check</goal>
+											<goal>check</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
