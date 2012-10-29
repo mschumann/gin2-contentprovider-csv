@@ -59,5 +59,8 @@
 			Comma seperated list of zero-based column numbers that contain timestamps;
 			default is null (empty)
 		</param>
+		<param name="recordAsFulltext" type="String" optional="true">
+			If 'true' and if 'column.fulltext' equals '-1', the raw record without delimeters is used as fulltext.
+		</param>
 	</params>
 </ginplugin>

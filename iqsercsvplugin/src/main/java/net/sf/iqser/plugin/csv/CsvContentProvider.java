@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
@@ -65,6 +66,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	private static final String CSV_PROPERTY_TIMESTAMPCOLUMNS = "columns.type.timestamp";
 	private static final String CSV_PROPERTY_FULLTEXTCOLUMN = "column.fulltext";
 	private static final String CSV_PROPERTY_CONTENT_TYPE = "content.type";
+	private static final String CSV_PROPERTY_RECORDASFULLTEXT = "recordAsFulltext";
 
 	// for backward compatibility
 	private static final String CSV_PROPERTY_FILE_OBSOLETE = "csv-file";
@@ -81,6 +83,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	public static final String CSV_DEFAULT_TIMESTAMPCOLUMNS = "";
 	public static final String CSV_DEFAULT_FULLTEXTCOLUMN = "-1";
 	public static final String CSV_DEFAULT_TYPE = "CSV Data";
+	public static final String CSV_DEFAULT_RECORDASFULLTEXT = "false";
 
 	public static final String CSV_CONTENT_URI_BASE = "iqser://iqsercsvplugin.sf.net/";
 
@@ -127,6 +130,8 @@ public class CsvContentProvider extends AbstractContentProvider {
 
 	/* Zero-based list of columns that contains timestamps. */
 	private List<Integer> timestampColumns;
+
+	private boolean recordAsFulltext = false;
 
 	/**
 	 * The last synchronization
@@ -191,11 +196,18 @@ public class CsvContentProvider extends AbstractContentProvider {
 
 		// Setting the content type
 		this.contentType = getInitParams().getProperty(CSV_PROPERTY_CONTENT_TYPE, CSV_DEFAULT_TYPE).trim();
-		this.setType(contentType);
+		this.setType(StringUtils.isNotBlank(this.contentType) ? contentType : CSV_DEFAULT_TYPE);
 		LOG.debug("Init param: contentType = " + contentType);
 
 		// Setting the file's delimeter.
-		this.delimeter = getInitParams().getProperty(CSV_PROPERTY_DELIMETER, CSV_DEFAULT_DELIMETER).trim().charAt(0);
+		try {
+			this.delimeter = getInitParams().getProperty(CSV_PROPERTY_DELIMETER, CSV_DEFAULT_DELIMETER).trim()
+					.charAt(0);
+		} catch (IndexOutOfBoundsException ioobe) {
+			LOG.warn(String.format("'%s' is an illegal delimeter. Default delimeter (%s) will be used.",
+					this.delimeter, CSV_DEFAULT_DELIMETER));
+			this.delimeter = CSV_DEFAULT_DELIMETER.charAt(0);
+		}
 		LOG.debug("Init param: delimeter = " + delimeter);
 
 		// Setting the file's charset.
@@ -211,14 +223,17 @@ public class CsvContentProvider extends AbstractContentProvider {
 
 		// Setting the zero-based list of numbers of the id-columns.
 		String idColumnsParamValue = getInitParams().getProperty(CSV_PROPERTY_IDCOLUMNS);
-		if (null == idColumnsParamValue || "".equals(idColumnsParamValue.trim())) {
+		if (StringUtils.isBlank(idColumnsParamValue)) {
 			idColumnsParamValue = getInitParams().getProperty(CSV_PROPERTY_IDCOLUMN, CSV_DEFAULT_IDCOLUMN);
+		}
+		if (StringUtils.isBlank(idColumnsParamValue)) {
+			idColumnsParamValue = CSV_DEFAULT_IDCOLUMN;
 		}
 		String[] idColumnStrings = idColumnsParamValue.split(",");
 		this.idColumns = new ArrayList<Integer>();
 		for (int i = 0; i < idColumnStrings.length; i++) {
 			try {
-				if (!(null == idColumnStrings[i] || "".equals(idColumnStrings[i].trim()))) {
+				if (StringUtils.isNotBlank(idColumnStrings[i])) {
 					this.idColumns.add(i, Integer.parseInt(idColumnStrings[i].trim()));
 				}
 			} catch (NumberFormatException e) {
@@ -234,19 +249,30 @@ public class CsvContentProvider extends AbstractContentProvider {
 				CSV_DEFAULT_IDASCONTENTURL));
 		LOG.debug("Init param: idAsContentUrl = " + idAsContentUrl);
 
-		// Setting the zero-based number of the fulltext-column.
-		this.fulltextColumn = Integer.parseInt(getInitParams().getProperty(CSV_PROPERTY_FULLTEXTCOLUMN,
-				CSV_DEFAULT_FULLTEXTCOLUMN));
-		LOG.debug("Init param: fulltextColumn = " + fulltextColumn);
+		// Setting the boolean recordAsFulltext-flag.
+		this.recordAsFulltext = Boolean.parseBoolean(getInitParams().getProperty(CSV_PROPERTY_RECORDASFULLTEXT,
+				CSV_DEFAULT_RECORDASFULLTEXT));
+		LOG.debug("Init param: idAsContentUrl = " + idAsContentUrl);
 
 		// Setting the zero-based number of the fulltext-column.
-		this.nameColumn = Integer
-				.parseInt(getInitParams().getProperty(CSV_PROPERTY_NAMECOLUMN, CSV_DEFAULT_NAMECOLUMN));
+		String fulltextColumnValue = getInitParams().getProperty(CSV_PROPERTY_FULLTEXTCOLUMN,
+				CSV_DEFAULT_FULLTEXTCOLUMN);
+		this.fulltextColumn = Integer.parseInt(StringUtils.isNotBlank(fulltextColumnValue) ? fulltextColumnValue.trim()
+				: CSV_DEFAULT_FULLTEXTCOLUMN);
+		LOG.debug("Init param: fulltextColumn = " + fulltextColumn);
+
+		// Setting the zero-based number of the name-column.
+		String nameColumnValue = getInitParams().getProperty(CSV_PROPERTY_NAMECOLUMN, CSV_DEFAULT_NAMECOLUMN);
+		this.nameColumn = Integer.parseInt(StringUtils.isNotBlank(nameColumnValue) ? nameColumnValue.trim()
+				: CSV_DEFAULT_NAMECOLUMN);
 		LOG.debug("Init param: nameColumn = " + nameColumn);
 
 		// Setting the timestamp columns' type.
 		String timestampColumnParamValue = getInitParams().getProperty(CSV_PROPERTY_TIMESTAMPCOLUMNS,
 				CSV_DEFAULT_TIMESTAMPCOLUMNS);
+		if (StringUtils.isBlank(timestampColumnParamValue)) {
+			timestampColumnParamValue = CSV_DEFAULT_TIMESTAMPCOLUMNS;
+		}
 		String[] timestampColumnStrings = timestampColumnParamValue.split(",");
 		this.timestampColumns = new ArrayList<Integer>();
 		for (int i = 0; i < timestampColumnStrings.length; i++) {
@@ -264,11 +290,14 @@ public class CsvContentProvider extends AbstractContentProvider {
 
 		// Setting the key columns.
 		String keyColumnParamValue = getInitParams().getProperty(CSV_PROPERTY_KEYCOLUMNS, CSV_DEFAULT_KEYCOLUMNS);
+		if (StringUtils.isBlank(keyColumnParamValue)) {
+			keyColumnParamValue = CSV_DEFAULT_KEYCOLUMNS;
+		}
 		String[] keyColumnStrings = keyColumnParamValue.split(",");
 		this.keyColumns = new ArrayList<Integer>();
 		for (int i = 0; i < keyColumnStrings.length; i++) {
 			try {
-				if (!(null == keyColumnStrings[i] || "".equals(keyColumnStrings[i].trim()))) {
+				if (StringUtils.isNotBlank(keyColumnStrings[i])) {
 					this.keyColumns.add(i, Integer.parseInt(keyColumnStrings[i].trim()));
 				}
 			} catch (NumberFormatException e) {
@@ -283,11 +312,14 @@ public class CsvContentProvider extends AbstractContentProvider {
 		// objects.
 		String ignoreColumnParamValue = getInitParams().getProperty(CSV_PROPERTY_IGNORECOLUMNS,
 				CSV_DEFAULT_IGNORECOLUMNS);
+		if (StringUtils.isBlank(ignoreColumnParamValue)) {
+			ignoreColumnParamValue = CSV_DEFAULT_IGNORECOLUMNS;
+		}
 		String[] ignoreColumnStrings = ignoreColumnParamValue.split(",");
 		this.ignoreColumns = new ArrayList<Integer>();
 		for (int i = 0; i < ignoreColumnStrings.length; i++) {
 			try {
-				if (null != ignoreColumnStrings[i] && !"".equals(ignoreColumnStrings[i].trim())) {
+				if (StringUtils.isNotBlank(ignoreColumnStrings[i])) {
 					this.ignoreColumns.add(i, Integer.parseInt(ignoreColumnStrings[i].trim()));
 				}
 			} catch (NumberFormatException e) {
@@ -394,8 +426,10 @@ public class CsvContentProvider extends AbstractContentProvider {
 	 */
 	public byte[] getBinaryData(Content c) {
 		LOG.info(String.format("Invoking %s#getBinaryData(Content c) ...", this.getClass().getSimpleName()));
-
-		return c.getFulltext().getBytes();
+		if (null != c.getFulltext()) {
+			return c.getFulltext().getBytes();
+		}
+		return "".getBytes();
 	}
 
 	/**
@@ -529,7 +563,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 											Attribute.ATTRIBUTE_TYPE_TEXT, false));
 								}
 
-								if (null == fulltext) {
+								if (null == fulltext && this.recordAsFulltext) {
 									// take the whole row as fulltext
 									fulltext = csvReader.getRawRecord().replace(delimeter, ' ');
 								}

@@ -46,9 +46,11 @@ public class CsvContentProviderTest extends MockObjectTestCase {
 
 		Properties initParams = new Properties();
 		initParams.setProperty("csv-file", System.getProperty("user.dir") + "/artcollection.csv");
-		initParams.setProperty("key-attributes", "[ARTIST] [TITLE] [MEDIUM] [Guide]");
-		initParams.setProperty("url-attribute", "NO");
+		initParams.setProperty("columns.key", "1,2,3,6");
+		initParams.setProperty("columns.id", "0");
+		initParams.setProperty("column.idAsContentUrl", "true");
 		initParams.setProperty("content.type", "Artwork");
+		initParams.setProperty("recordAsFulltext", "true");
 
 		provider = new CsvContentProvider();
 		provider.setInitParams(initParams);
