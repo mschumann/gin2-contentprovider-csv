@@ -16,10 +16,6 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		contents = new ArrayList<Content>();
 	}
 
-	public void addContent(Content arg0) throws IQserException {
-		contents.add(arg0);
-	}
-
 	public Collection<Content> getExistingContents(String arg0) throws IQserException {
 
 		Collection<Content> col = new ArrayList<Content>();
@@ -55,7 +51,7 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		}
 	}
 
-	public void updateContent(Content arg0) throws IQserException {
+	public void addOrUpdateContent(Content arg0) throws IQserException {
 		Iterator<Content> cIter = contents.iterator();
 
 		while (cIter.hasNext()) {
@@ -65,6 +61,9 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 				contents.remove(c);
 				contents.add(arg0);
 				break;
+			}
+			else {
+				contents.add(arg0);
 			}
 		}
 	}
