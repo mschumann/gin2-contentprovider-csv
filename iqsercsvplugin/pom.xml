@@ -91,7 +91,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<iqser.version>2.0.0.33-SNAPSHOT</iqser.version>
-		<compileSource>1.5</compileSource>
+		<compileSource>1.6</compileSource>
 		<sourceforge.artifact>${project.build.directory}/${project.build.finalName}</sourceforge.artifact>
 		<sourceforge.upload>${sf.username},iqsercsvplugin@frs.sourceforge.net:/home/pfs/project/i/iq/iqsercsvplugin</sourceforge.upload>
 	</properties>

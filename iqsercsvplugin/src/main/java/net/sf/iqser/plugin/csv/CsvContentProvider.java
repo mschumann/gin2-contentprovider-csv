@@ -361,6 +361,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 			for (String contentUrl : contentUrls) {
 				Content content = createContent(contentUrl);
 				try {
+					LOG.info(String.format("Invoking %s#addOrUpdateContent() for ContentURL: %s ...", this.getClass().getSimpleName(), contentUrl));
 					addOrUpdateContent(content);
 					// Let the application container take a breath and sleep for
 					// 0,1 second.

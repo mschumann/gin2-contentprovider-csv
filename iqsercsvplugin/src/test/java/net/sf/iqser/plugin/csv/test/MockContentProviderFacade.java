@@ -52,19 +52,19 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 	}
 
 	public void addOrUpdateContent(Content arg0) throws IQserException {
+		boolean isUpdate = false;
 		Iterator<Content> cIter = contents.iterator();
-
 		while (cIter.hasNext()) {
 			Content c = cIter.next();
-
 			if (c.getContentUrl().equalsIgnoreCase(arg0.getContentUrl())) {
 				contents.remove(c);
 				contents.add(arg0);
+				isUpdate = true;
 				break;
 			}
-			else {
-				contents.add(arg0);
-			}
+		}
+		if (!isUpdate) {
+			contents.add(arg0);
 		}
 	}
 
