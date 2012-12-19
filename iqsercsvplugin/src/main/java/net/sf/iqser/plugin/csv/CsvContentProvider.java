@@ -196,16 +196,14 @@ public class CsvContentProvider extends AbstractContentProvider {
 
 		// Setting the content type
 		contentType = getInitParams().getProperty(CSV_PROPERTY_CONTENT_TYPE, CSV_DEFAULT_TYPE).trim();
-		setType(StringUtils.isNotBlank(contentType) ? contentType : CSV_DEFAULT_TYPE);
 		LOG.debug("Init param: contentType = " + contentType);
 
 		// Setting the file's delimeter.
 		try {
-			delimeter = getInitParams().getProperty(CSV_PROPERTY_DELIMETER, CSV_DEFAULT_DELIMETER).trim()
-					.charAt(0);
+			delimeter = getInitParams().getProperty(CSV_PROPERTY_DELIMETER, CSV_DEFAULT_DELIMETER).trim().charAt(0);
 		} catch (IndexOutOfBoundsException ioobe) {
-			LOG.warn(String.format("'%s' is an illegal delimeter. Default delimeter (%s) will be used.",
-					delimeter, CSV_DEFAULT_DELIMETER));
+			LOG.warn(String.format("'%s' is an illegal delimeter. Default delimeter (%s) will be used.", delimeter,
+					CSV_DEFAULT_DELIMETER));
 			delimeter = CSV_DEFAULT_DELIMETER.charAt(0);
 		}
 		LOG.debug("Init param: delimeter = " + delimeter);
@@ -361,7 +359,8 @@ public class CsvContentProvider extends AbstractContentProvider {
 			for (String contentUrl : contentUrls) {
 				Content content = createContent(contentUrl);
 				try {
-					LOG.info(String.format("Invoking %s#addOrUpdateContent() for ContentURL: %s ...", this.getClass().getSimpleName(), contentUrl));
+					LOG.info(String.format("Invoking %s#addOrUpdateContent() for ContentURL: %s ...", this.getClass()
+							.getSimpleName(), contentUrl));
 					addOrUpdateContent(content);
 					// Let the application container take a breath and sleep for
 					// 0,1 second.
@@ -421,6 +420,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	 * 
 	 * @see com.iqser.core.plugin.ContentProvider#getBinaryData(com.iqser.core.model .Content)
 	 */
+	@Override
 	public byte[] getBinaryData(Content c) {
 		LOG.info(String.format("Invoking %s#getBinaryData(Content c) ...", this.getClass().getSimpleName()));
 		if (null != c.getFulltext()) {
@@ -470,8 +470,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 
 				CsvReader csvReader = null;
 				try {
-					csvReader = new CsvReader(new InputStreamReader(new FileInputStream(file), charset),
-							delimeter);
+					csvReader = new CsvReader(new InputStreamReader(new FileInputStream(file), charset), delimeter);
 				} catch (FileNotFoundException e) {
 					LOG.error("Could not read file: " + file.getPath(), e);
 					return contentMap.keySet();
@@ -540,8 +539,8 @@ public class CsvContentProvider extends AbstractContentProvider {
 								String fulltext = null;
 								if (i == fulltextColumn) {
 									fulltext = attribute.getValue();
-								} else if (!ignoreColumns.contains(Integer.valueOf(i))
-										&& null != attribute.getValue() && !"".equals(attribute.getValue().trim())) {
+								} else if (!ignoreColumns.contains(Integer.valueOf(i)) && null != attribute.getValue()
+										&& !"".equals(attribute.getValue().trim())) {
 									// empty attributes, the fulltext
 									// attribute (if present) and those that
 									// should be ignored are not added to
