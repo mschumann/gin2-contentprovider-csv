@@ -511,7 +511,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 								}
 
 								Attribute attribute = new Attribute();
-								attribute.setName(attributes[i]);
+								attribute.setName(attributes[i].toUpperCase().replace(' ', '_'));
 								attribute.addValue(attributeValue);
 								if (timestampColumns.contains(Integer.valueOf(i))) {
 									attribute.setType(Attribute.ATTRIBUTE_TYPE_DATE);
