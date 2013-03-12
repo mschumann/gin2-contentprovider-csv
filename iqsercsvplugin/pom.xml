@@ -109,7 +109,7 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>iqsercsvplugin-repo</id>
+			<id>iqsercsvplugin-repo-snapshot</id>
 			<name>iQser CSV Plugin Repository</name>
 			<url>http://iqsercsvplugin.sourceforge.net/maven2-snap</url>
 			<releases>
@@ -120,7 +120,7 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>iqsercsvplugin-repo</id>
+			<id>iqsercsvplugin-repo-release</id>
 			<name>iQser CSV Plugin Repository</name>
 			<url>http://iqsercsvplugin.sourceforge.net/maven2</url>
 			<releases>
@@ -146,14 +146,14 @@
 
 	<distributionManagement>
 		<repository>
-			<id>iqsercsvplugin-repo</id>
+			<id>iqsercsvplugin-repo-release</id>
 			<name>iQser CSV Plugin Repository</name>
 			<url>
 				sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs/maven2
 			</url>
 		</repository>
 		<snapshotRepository>
-			<id>iqsercsvplugin-repo-snap</id>
+			<id>iqsercsvplugin-repo-snapshot</id>
 			<name>iQser CSV Plugin Snapshot-Repository</name>
 			<url>
 				sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs/maven2-snap
@@ -219,30 +219,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.3</version>
-				<dependencies>
-					<dependency>
-						<groupId>com.iqser</groupId>
-						<artifactId>iqser-qa</artifactId>
-						<version>1.0</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>checkstyle</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<configLocation>checkstyle/checkstyle.xml</configLocation>
-					<failsOnError>false</failsOnError>
-					<linkXref>true</linkXref>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -512,6 +488,30 @@
 								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>2.9.1</version>
+					<dependencies>
+						<dependency>
+							<groupId>com.iqser</groupId>
+							<artifactId>iqser-qa</artifactId>
+							<version>1.1</version>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<phase>process-sources</phase>
+							<goals>
+								<goal>checkstyle</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<configLocation>checkstyle/checkstyle.xml</configLocation>
+						<failsOnError>true</failsOnError>
 					</configuration>
 				</plugin>
 			</plugins>
