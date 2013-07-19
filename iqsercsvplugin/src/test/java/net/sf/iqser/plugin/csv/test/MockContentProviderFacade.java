@@ -16,11 +16,8 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		contents = new ArrayList<Content>();
 	}
 
-	public void addContent(Content arg0) throws IQserException {
-		contents.add(arg0);
-	}
-
-	public Collection<Content> getExistingContents(String arg0) throws IQserException {
+	public Collection<Content> getExistingContents(String arg0)
+			throws IQserException {
 
 		Collection<Content> col = new ArrayList<Content>();
 		col.addAll(contents);
@@ -28,7 +25,8 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		return col;
 	}
 
-	public boolean isExistingContent(String arg0, String arg1) throws IQserException {
+	public boolean isExistingContent(String arg0, String arg1)
+			throws IQserException {
 		Iterator<Content> cIter = contents.iterator();
 
 		while (cIter.hasNext()) {
@@ -55,22 +53,26 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		}
 	}
 
+	public void addContent(Content arg0) throws IQserException {
+		contents.add(arg0);
+	}
+
+	public Content getExistingContent(String arg0, String arg1)
+			throws IQserException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public void updateContent(Content arg0) throws IQserException {
 		Iterator<Content> cIter = contents.iterator();
-
 		while (cIter.hasNext()) {
 			Content c = cIter.next();
-
 			if (c.getContentUrl().equalsIgnoreCase(arg0.getContentUrl())) {
 				contents.remove(c);
 				contents.add(arg0);
 				break;
 			}
 		}
-	}
-
-	public Content getExistingContent(String arg0, String arg1) throws IQserException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.sf.iqser.plugin.csv</groupId>
@@ -26,9 +27,13 @@
 	</issueManagement>
 
 	<scm>
-		<connection>scm:svn:http://${project.artifactId}.sourceforge.net/viewvc/${project.artifactId}/trunk</connection>
-		<developerConnection>scm:svn:https://${project.artifactId}.svn.sourceforge.net/svnroot/${project.artifactId}/trunk</developerConnection>
-		<url>http://${project.artifactId}.svn.sourceforge.net/viewvc/${project.artifactId}</url>
+		<connection>
+			scm:svn:http://iqsercsvplugin.sourceforge.net/viewvc/iqsercsvplugin/trunk
+		</connection>
+		<developerConnection>
+			scm:svn:https://iqsercsvplugin.svn.sourceforge.net/svnroot/iqsercsvplugin/trunk
+		</developerConnection>
+		<url>http://iqsercsvplugin.svn.sourceforge.net/viewvc/iqsercsvplugin</url>
 	</scm>
 
 	<developers>
@@ -85,10 +90,10 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<iqser.version>2.0-SNAPSHOT</iqser.version>
+		<iqser.version>2.0.0.37-SNAPSHOT</iqser.version>
 		<compileSource>1.6</compileSource>
 		<sourceforge.artifact>${project.build.directory}/${project.build.finalName}</sourceforge.artifact>
-		<sourceforge.upload>${sf.username},${project.artifactId}@frs.sourceforge.net:/home/pfs/project/i/iq/${project.artifactId}</sourceforge.upload>
+		<sourceforge.upload>${sf.username},iqsercsvplugin@frs.sourceforge.net:/home/pfs/project/i/iq/iqsercsvplugin</sourceforge.upload>
 	</properties>
 
 	<repositories>
@@ -106,7 +111,7 @@
 		<repository>
 			<id>iqsercsvplugin-repo-snapshot</id>
 			<name>iQser CSV Plugin Repository</name>
-			<url>http://${project.artifactId}.sourceforge.net/maven2-snap</url>
+			<url>http://iqsercsvplugin.sourceforge.net/maven2-snap</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -117,7 +122,7 @@
 		<repository>
 			<id>iqsercsvplugin-repo-release</id>
 			<name>iQser CSV Plugin Repository</name>
-			<url>http://${project.artifactId}.sourceforge.net/maven2</url>
+			<url>http://iqsercsvplugin.sourceforge.net/maven2</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -143,18 +148,22 @@
 		<repository>
 			<id>iqsercsvplugin-repo-release</id>
 			<name>iQser CSV Plugin Repository</name>
-			<url>sftp://web.sourceforge.net/home/project-web/${project.artifactId}/htdocs/maven2</url>
+			<url>
+				sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs/maven2
+			</url>
 		</repository>
 		<snapshotRepository>
 			<id>iqsercsvplugin-repo-snapshot</id>
 			<name>iQser CSV Plugin Snapshot-Repository</name>
-			<url>sftp://web.sourceforge.net/home/project-web/${project.artifactId}/htdocs/maven2-snap</url>
+			<url>
+				sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs/maven2-snap
+			</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<site>
 			<id>iqsercsvplugin.sourceforge.net</id>
 			<name>iQser CSV Plugin</name>
-			<url>sftp://web.sourceforge.net/home/project-web/${project.artifactId}/htdocs</url>
+			<url>sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs</url>
 		</site>
 	</distributionManagement>
 
@@ -197,7 +206,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.7.1</version>
 				<configuration>
 					<source>${compileSource}</source>
 					<linkXref>true</linkXref>
@@ -215,7 +223,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.5.2</version>
+				<version>2.5</version>
 				<configuration>
 					<check>
 						<branchRate>75</branchRate>
@@ -258,7 +266,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
+				<version>2.7</version>
 				<executions>
 					<execution>
 						<id>javadoc-jar</id>
@@ -313,7 +321,9 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-								<copy file="${project.build.directory}/${project.build.finalName}.zip" tofile="${project.build.directory}/${project.build.finalName}.gin" />
+								<copy
+									file="${project.build.directory}/${project.build.finalName}.zip"
+									tofile="${project.build.directory}/${project.build.finalName}.gin" />
 							</target>
 						</configuration>
 						<goals>
@@ -329,8 +339,10 @@
 						<configuration>
 							<target>
 								<echo message="Preparing ginplugin.xml" />
-								<copy failonerror="true" file="${basedir}/src/main/assembly/ginplugin.xml" tofile="${basedir}/target/generated-resources/ginplugin.xml" />
-								<replace file="${basedir}/target/generated-resources/ginplugin.xml" token="###VERSION###" value="${project.version}" />
+								<copy failonerror="true"
+									file="${basedir}/src/main/assembly/ginplugin.xml" tofile="${basedir}/target/generated-resources/ginplugin.xml" />
+								<replace file="${basedir}/target/generated-resources/ginplugin.xml"
+									token="###VERSION###" value="${project.version}" />
 							</target>
 						</configuration>
 					</execution>
@@ -381,7 +393,8 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<scp todir="${sourceforge.upload}" password="${sf.password}" trust="true">
+								<scp todir="${sourceforge.upload}" password="${sf.password}"
+									trust="true">
 									<fileset dir="${project.build.directory}">
 										<include name="${project.build.finalName}*.gin" />
 									</fileset>
@@ -409,7 +422,8 @@
 		</extensions>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -419,9 +433,15 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-pmd-plugin</artifactId>
-										<versionRange>[2.7,)</versionRange>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-pmd-plugin
+										</artifactId>
+										<versionRange>
+											[2.7,)
+										</versionRange>
 										<goals>
 											<goal>cpd-check</goal>
 											<goal>check</goal>
@@ -433,9 +453,15 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-checkstyle-plugin</artifactId>
-										<versionRange>[2.3,)</versionRange>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-checkstyle-plugin
+										</artifactId>
+										<versionRange>
+											[2.3,)
+										</versionRange>
 										<goals>
 											<goal>checkstyle</goal>
 										</goals>
@@ -446,9 +472,15 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-antrun-plugin</artifactId>
-										<versionRange>[1.7,)</versionRange>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-antrun-plugin
+										</artifactId>
+										<versionRange>
+											[1.7,)
+										</versionRange>
 										<goals>
 											<goal>run</goal>
 										</goals>
@@ -494,7 +526,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.5.2</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -509,7 +540,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.7.1</version>
 				<configuration>
 					<targetJdk>${compileSource}</targetJdk>
 				</configuration>

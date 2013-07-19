@@ -5,7 +5,7 @@
 
 	<name>CSV Content Provider</name>
 	<vendor>iQser GmbH</vendor>
-	<version>2.0-SNAPSHOT</version>
+	<version>###VERSION###</version>
 
 	<description>
 		This ContentProvider plugin is able to connect to a file repository 
@@ -54,6 +54,13 @@
 		<param name="columns.ignore" type="String" optional="true">
 			Comma seperated list of zero-based column numbers that will be ignored;
 			default is null (empty)
+		</param>
+		<param name="columns.type.timestamp" type="String" optional="true">
+			Comma seperated list of zero-based column numbers that contain timestamps;
+			default is null (empty)
+		</param>
+		<param name="recordAsFulltext" type="String" optional="true">
+			If 'true' and if 'column.fulltext' equals '-1', the raw record without delimeters is used as fulltext.
 		</param>
 	</params>
 </ginplugin>
