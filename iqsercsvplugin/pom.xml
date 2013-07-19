@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.sf.iqser.plugin.csv</groupId>
@@ -9,7 +8,7 @@
 	<packaging>jar</packaging>
 
 	<name>CSV ContentProvider for iQser GIN</name>
-	<description>The goal of this project is to provide a ContentProvider plugin for CSV files for iQser GIN Semantic Middleware (www.iqser.com).</description>
+	<description>ContentProvider plugin for iQser GIN Server  (www.iqser.com) to connect structure data from CSV files.</description>
 	<url>http://iqsercsvplugin.sourceforge.net</url>
 
 	<licenses>
@@ -27,13 +26,9 @@
 	</issueManagement>
 
 	<scm>
-		<connection>
-			scm:svn:http://iqsercsvplugin.sourceforge.net/viewvc/iqsercsvplugin/trunk
-		</connection>
-		<developerConnection>
-			scm:svn:https://iqsercsvplugin.svn.sourceforge.net/svnroot/iqsercsvplugin/trunk
-		</developerConnection>
-		<url>http://iqsercsvplugin.svn.sourceforge.net/viewvc/iqsercsvplugin</url>
+		<connection>scm:svn:http://${project.artifactId}.sourceforge.net/viewvc/${project.artifactId}/trunk</connection>
+		<developerConnection>scm:svn:https://${project.artifactId}.svn.sourceforge.net/svnroot/${project.artifactId}/trunk</developerConnection>
+		<url>http://${project.artifactId}.svn.sourceforge.net/viewvc/${project.artifactId}</url>
 	</scm>
 
 	<developers>
@@ -91,9 +86,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<iqser.version>2.0-SNAPSHOT</iqser.version>
-		<compileSource>1.5</compileSource>
+		<compileSource>1.6</compileSource>
 		<sourceforge.artifact>${project.build.directory}/${project.build.finalName}</sourceforge.artifact>
-		<sourceforge.upload>${sf.username},iqsercsvplugin@frs.sourceforge.net:/home/pfs/project/i/iq/iqsercsvplugin</sourceforge.upload>
+		<sourceforge.upload>${sf.username},${project.artifactId}@frs.sourceforge.net:/home/pfs/project/i/iq/${project.artifactId}</sourceforge.upload>
 	</properties>
 
 	<repositories>
@@ -109,9 +104,9 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>iqsercsvplugin-repo</id>
+			<id>iqsercsvplugin-repo-snapshot</id>
 			<name>iQser CSV Plugin Repository</name>
-			<url>http://iqsercsvplugin.sourceforge.net/maven2-snap</url>
+			<url>http://${project.artifactId}.sourceforge.net/maven2-snap</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -120,9 +115,9 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>iqsercsvplugin-repo</id>
+			<id>iqsercsvplugin-repo-release</id>
 			<name>iQser CSV Plugin Repository</name>
-			<url>http://iqsercsvplugin.sourceforge.net/maven2</url>
+			<url>http://${project.artifactId}.sourceforge.net/maven2</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -146,24 +141,20 @@
 
 	<distributionManagement>
 		<repository>
-			<id>iqsercsvplugin-repo</id>
+			<id>iqsercsvplugin-repo-release</id>
 			<name>iQser CSV Plugin Repository</name>
-			<url>
-				sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs/maven2
-			</url>
+			<url>sftp://web.sourceforge.net/home/project-web/${project.artifactId}/htdocs/maven2</url>
 		</repository>
 		<snapshotRepository>
-			<id>iqsercsvplugin-repo-snap</id>
+			<id>iqsercsvplugin-repo-snapshot</id>
 			<name>iQser CSV Plugin Snapshot-Repository</name>
-			<url>
-				sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs/maven2-snap
-			</url>
+			<url>sftp://web.sourceforge.net/home/project-web/${project.artifactId}/htdocs/maven2-snap</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<site>
 			<id>iqsercsvplugin.sourceforge.net</id>
 			<name>iQser CSV Plugin</name>
-			<url>sftp://web.sourceforge.net/home/project-web/iqsercsvplugin/htdocs</url>
+			<url>sftp://web.sourceforge.net/home/project-web/${project.artifactId}/htdocs</url>
 		</site>
 	</distributionManagement>
 
@@ -206,6 +197,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-pmd-plugin</artifactId>
+				<version>2.7.1</version>
 				<configuration>
 					<source>${compileSource}</source>
 					<linkXref>true</linkXref>
@@ -221,33 +213,9 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.3</version>
-				<dependencies>
-					<dependency>
-						<groupId>com.iqser</groupId>
-						<artifactId>iqser-qa</artifactId>
-						<version>1.0</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>checkstyle</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<configLocation>checkstyle/checkstyle.xml</configLocation>
-					<failsOnError>false</failsOnError>
-					<linkXref>true</linkXref>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.5</version>
+				<version>2.5.2</version>
 				<configuration>
 					<check>
 						<branchRate>75</branchRate>
@@ -290,7 +258,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.7</version>
+				<version>2.9.1</version>
 				<executions>
 					<execution>
 						<id>javadoc-jar</id>
@@ -345,14 +313,26 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-								<copy
-									file="${project.build.directory}/${project.build.finalName}.zip"
-									tofile="${project.build.directory}/${project.build.finalName}.gin" />
+								<copy file="${project.build.directory}/${project.build.finalName}.zip" tofile="${project.build.directory}/${project.build.finalName}.gin" />
 							</target>
 						</configuration>
 						<goals>
 							<goal>run</goal>
 						</goals>
+					</execution>
+					<execution>
+						<id>prepare_ginplugin.xml</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<target>
+								<echo message="Preparing ginplugin.xml" />
+								<copy failonerror="true" file="${basedir}/src/main/assembly/ginplugin.xml" tofile="${basedir}/target/generated-resources/ginplugin.xml" />
+								<replace file="${basedir}/target/generated-resources/ginplugin.xml" token="###VERSION###" value="${project.version}" />
+							</target>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -401,8 +381,7 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<scp todir="${sourceforge.upload}" password="${sf.password}"
-									trust="true">
+								<scp todir="${sourceforge.upload}" password="${sf.password}" trust="true">
 									<fileset dir="${project.build.directory}">
 										<include name="${project.build.finalName}*.gin" />
 									</fileset>
@@ -422,13 +401,15 @@
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-webdav</artifactId>
-				<version>1.0-beta-1</version>
+			</extension>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
 			</extension>
 		</extensions>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -438,17 +419,12 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-pmd-plugin
-										</artifactId>
-										<versionRange>
-											[2.7,)
-										</versionRange>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-pmd-plugin</artifactId>
+										<versionRange>[2.7,)</versionRange>
 										<goals>
 											<goal>cpd-check</goal>
+											<goal>check</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
@@ -457,15 +433,9 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-checkstyle-plugin
-										</artifactId>
-										<versionRange>
-											[2.3,)
-										</versionRange>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-checkstyle-plugin</artifactId>
+										<versionRange>[2.3,)</versionRange>
 										<goals>
 											<goal>checkstyle</goal>
 										</goals>
@@ -474,8 +444,45 @@
 										<ignore></ignore>
 									</action>
 								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+										<versionRange>[1.7,)</versionRange>
+										<goals>
+											<goal>run</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>2.9.1</version>
+					<dependencies>
+						<dependency>
+							<groupId>com.iqser</groupId>
+							<artifactId>iqser-qa</artifactId>
+							<version>1.1</version>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<phase>process-sources</phase>
+							<goals>
+								<goal>checkstyle</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<configLocation>checkstyle/checkstyle.xml</configLocation>
+						<failsOnError>true</failsOnError>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -487,6 +494,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.5.2</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -501,6 +509,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-pmd-plugin</artifactId>
+				<version>2.7.1</version>
 				<configuration>
 					<targetJdk>${compileSource}</targetJdk>
 				</configuration>
