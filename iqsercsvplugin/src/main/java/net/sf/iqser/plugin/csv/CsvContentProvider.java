@@ -185,9 +185,9 @@ public class CsvContentProvider extends AbstractContentProvider {
 						+ fileUri.isAbsolute());
 			} catch (URISyntaxException e) {
 				if (LOG.isDebugEnabled()) {
-					LOG.warn(filename + " is no vaild URI.", e);
+					LOG.warn(filename + " is no valid URI.", e);
 				} else {
-					LOG.warn(filename + " is no vaild URI.");
+					LOG.warn(filename + " is no valid URI.");
 				}
 			}
 
