@@ -352,7 +352,7 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>publish_jar</id>
+						<id>publish_gin</id>
 						<phase>deploy</phase>
 						<goals>
 							<goal>run</goal>
@@ -366,6 +366,57 @@
 									</fileset>
 								</scp>
 							</tasks>
+						</configuration>
+					</execution>
+					<execution>
+						<id>publish_jar</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo message="Copy JAR (${project.build.finalName}) to sourceforge" />
+								<scp todir="${sourceforge.upload}" password="${sf.password}" trust="true">
+									<fileset dir="${project.build.directory}/">
+										<include name="${project.build.finalName}.jar" />
+									</fileset>
+								</scp>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>publish_sources</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo message="Copy ${project.build.finalName}-sources.jar to sourceforge" />
+								<scp todir="${sourceforge.upload}" password="${sf.password}" trust="true">
+									<fileset dir="${project.build.directory}/">
+										<include name="${project.build.finalName}-sources.jar" />
+									</fileset>
+								</scp>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>publish_javadoc</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo message="Copy javadoc Archive (${project.build.finalName}) to sourceforge." />
+								<scp todir="${sourceforge.upload}" password="${sf.password}" trust="true">
+									<fileset dir="${project.build.directory}/">
+										<include name="${project.build.finalName}-javadoc.jar" />
+									</fileset>
+								</scp>
+							</target>
 						</configuration>
 					</execution>
 				</executions>
@@ -392,11 +443,34 @@
 					</execution>
 				</executions>
 			</plugin>
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>2.2</version>
+				<version>3.3</version>
+				<dependencies>
+					<!-- additional dependencies required by "source-class" implementations are added here -->
+					<dependency>
+						<groupId>org.tinyjee.dim</groupId>
+						<artifactId>doxia-include-macro</artifactId>
+						<version>1.1</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+					<id>generate_site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>site</goal>
+						</goals>
+					</execution>
+					<execution>
+					<id>deploy_site</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<extensions>
