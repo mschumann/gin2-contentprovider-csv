@@ -86,7 +86,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<iqser.version>2.0.0.37-SNAPSHOT</iqser.version>
+		<iqser.version>2.0</iqser.version>
 		<compileSource>1.6</compileSource>
 		<sourceforge.artifact>${project.build.directory}/${project.build.finalName}</sourceforge.artifact>
 		<sourceforge.upload>${sf.username},${project.artifactId}@frs.sourceforge.net:/home/pfs/project/i/iq/${project.artifactId}</sourceforge.upload>
@@ -127,6 +127,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>iqser_release</id>
