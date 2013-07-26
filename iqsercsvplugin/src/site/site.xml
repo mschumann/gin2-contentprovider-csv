@@ -11,7 +11,7 @@
 
 		<menu name="Welcome">
 			<item name="Introduction" href="index.html"/>
-			<item name="Support" href="support.html"/>
+<!-- 			<item name="Support" href="support.html"/> -->
 			<item name="Download" href="http://sourceforge.net/projects/iqsercsvplugin/files/"/>
 <!-- 			<item name="Join us" href="contribution.html"/> -->
 		</menu>
