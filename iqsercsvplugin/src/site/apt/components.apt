@@ -1,0 +1,60 @@
+ -----
+ Components
+ -----
+
+Components
+
+ The project is splitted in several components to improve reusability.
+ 
+ <<Reminder: To access the iQser Maven Repository, you need a developer account. Contact {{{http://www.iqser.com/web/guest/kontakt}iQser}} to get one, it's free of charge.>>
+
+* File Parser
+
+ The File Parser are the base for tranforming unstructed files into structed content objects. We are using common frameworks like {{{http://tika.apache.org/}Tika}} and {{{http://pdfbox.apache.org/}PDFBox}} to extract text and metadata.
+ 
+ Supported file types are:
+ 
+ * MS Office OLE (MS Office 97 - 2003)
+ 
+ * MS Office Office Open XML (since MS Office 2007)
+ 
+ * Adobe PDF
+ 
+ * Plain Text
+ 
+ * Rich Text Format RTF
+ 
+ * HyperText Markup Language HTML
+ 
+ * OpenDocument (like OpenOffice)
+ 
+ * ZIP Archives
+
+ []
+ 
+* Filesystem Content Provider
+
+ The Filesystem Content Provider is a ContentProvider plugin for the iQser GIN Platform. 
+ This Content Provider connects a local filesystem to the iQser GIN Platform.
+ 
+* CMIS Content Provider
+
+ <Under Development>
+ 
+ The {{{http://www.oasis-open.org/committees/cmis/}CMIS}} Content Provider is a ContentProvider plugin for the iQser GIN Platform. 
+ This Content Provider connects a Enterprise Content Management System that supports the {{{http://www.oasis-open.org/committees/cmis/}CMIS}} Standard to the iQser GIN Platform.
+ 
+ The {{{http://www.oasis-open.org/committees/cmis/}CMIS}} Standard is supported by:
+ 
+ * Microsoft Sharepoint Server 2010
+ 
+ * IBM FileNet 5.0
+ 
+ * Lotus Connections Files 3.0
+ 
+ * {{{http://en.wikipedia.org/wiki/Content_Management_Interoperability_Services#List_of_implementations}and others}}
+ 
+ []
+ 
+
+ 

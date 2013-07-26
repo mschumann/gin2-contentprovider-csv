@@ -1,0 +1,95 @@
+<!-- START SNIPPET: iqser_config -->
+...
+<plugins>
+	...
+	<plugin>
+		<id>net.sf.iqser.plugin.filesystem</id>
+		<type>Document</type>
+		<name>Filesystem Content Provider</name>
+		<vendor>IQser Technologies</vendor>
+		<provider-class>net.sf.iqser.plugin.filesystem.FilesystemContentProvider
+		</provider-class>
+		<!-- Use a Cron formatted string to define the synchronisation schedule. -->
+		<scheduler>
+			<syncjob>0 5 * * * ?</syncjob>
+			<housekeeperjob>0 0 23 * * ?</housekeeperjob>
+		</scheduler>
+
+		<init-param>
+			<!-- folder from where the files are read -->
+			<param-name>folder</param-name>
+			<param-value>[D:/folder1/][D:/folder2/]</param-value>
+		</init-param>
+		<init-param>
+			<!-- file filter pattern -->
+			<param-name>filter-pattern</param-name>
+			<param-value>[txt][pdf][zip]</param-value>
+		</init-param>
+		<init-param>
+			<!-- folders that are taken in consideration -->
+			<param-name>filter-folder-include</param-name>
+			<param-value>[D:/folder1/include]</param-value>
+		</init-param>
+		<init-param>
+			<!-- folder that are not taken in consideration -->
+			<param-name>filter-folder-exclude</param-name>
+			<param-value>[D:/folder2/exclude]</param-value>
+		</init-param>
+		<init-param>
+			<!-- the attributes of a content that are keys -->
+			<param-name>key-attributes</param-name>
+			<param-value>[Title][Author][attr3][attr4]</param-value>
+		</init-param>
+		<init-param>
+			<!-- attribute mappings -->
+			<param-name>attribute.mappings</param-name>
+			<param-value>{AUTHOR:Autor, TITLE:Bezeichnung} </param-value>
+		</init-param>
+	</plugin>
+	...
+</plugins>
+...
+<!-- END SNIPPET: iqser_config -->
+<!-- START SNIPPET: config_opts -->
+...
+<init-param>
+	<!-- folder from where the files are read -->
+	<param-name>folder</param-name>
+	<param-value>[D:/folder1/][D:/folder2/]</param-value>
+</init-param>
+<!-- file filter pattern -->
+<param-name>filter-pattern</param-name>
+<param-value>[txt][zip]</param-value>
+</init-param>
+<init-param>
+	<!-- folders that are taken in consideration -->
+	<param-name>filter-folder-include</param-name>
+	<param-value>[D:/folder1/included1/][D:/folder2/included2/]</param-value>
+</init-param>
+<init-param>
+	<!-- folder that are not taken in consideration -->
+	<param-name>filter-folder-exclude</param-name>
+	<param-value>[D:/files1/excluded1/][D:/files2/exluded2/]</param-value>
+</init-param>
+...
+<!-- END SNIPPET: config_opts -->
+
+
+<!-- START SNIPPET: init1 -->
+...
+<init-param>
+	<!-- the attributes of a content that are keys -->
+	<param-name>key-attributes</param-name>
+	<param-value>[Title][Author]</param-value>
+</init-param>
+...
+<!-- END SNIPPET: init1 -->
+<!-- START SNIPPET: init2 -->
+...
+<init-param>
+	<!-- attribute mappings for certain parameters extracted by the mail api in json format -->
+	<param-name>attribute.mappings</param-name>
+	<param-value>{AUTHOR:Autor, Last-Author:Autor, Author:Autor, title:Bezeichnung,TITLE:Bezeichnung}</param-value>
+</init-param>
+...
+<!-- END SNIPPET: init2 -->

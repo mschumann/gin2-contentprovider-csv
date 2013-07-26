@@ -1,0 +1,67 @@
+<!-- START SNIPPET: repo -->
+...
+<repositories>
+	...
+	<repository>
+		<id>iqser_release</id>
+		<name>iQser Repository</name>
+		<url>http://repo.iqser.com/artifactory/repo</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>false</enabled>
+		</snapshots>
+	</repository>
+	<repository>
+		<id>iqserfileplugin-repo</id>
+		<name>iQser File Plugin Repository</name>
+		<url>http://iqserfileplugin.sourceforge.net/maven2</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>false</enabled>
+		</snapshots>
+	</repository>
+	<repository>
+		<id>iqserfileplugin-repo-snap</id>
+		<name>iQser File Plugin Snapshot Repository</name>
+		<url>http://iqserfileplugin.sourceforge.net/maven2-snap</url>
+		<releases>
+			<enabled>false</enabled>
+		</releases>
+		<snapshots>
+			<enabled>true</enabled>
+		</snapshots>
+	</repository>
+	...
+</repositories>
+...
+<!-- END SNIPPET: repo -->
+<!-- START SNIPPET: file_cp_dep -->
+...
+<dependencies>
+	...
+	<dependency>
+		<groupId>net.sf.iqser.plugin.file</groupId>
+		<artifactId>filesystem-provider</artifactId>
+		<version>2.0-SNAPSHOT</version>
+	</dependency>
+	...
+</dependencies>
+...
+<!-- END SNIPPET: file_cp_dep -->
+<!-- START SNIPPET: file_parser_dep -->
+...
+<dependencies>
+	...
+	<dependency>
+		<groupId>net.sf.iqser.plugin.file</groupId>
+		<artifactId>file-parser</artifactId>
+		<version>2.0-SNAPSHOT</version>
+	</dependency>
+	...
+</dependencies>
+...
+<!-- END SNIPPET: file_parser_dep -->

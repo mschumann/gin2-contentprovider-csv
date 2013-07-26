@@ -448,7 +448,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>2.2</version>
+				<version>3.3</version>
+				<configuration>
+					<templateFile>${basedir}/site.xml</templateFile>
+				</configuration>
 				<dependencies>
 					<!-- additional dependencies required by "source-class" implementations are added here -->
 					<dependency>
@@ -464,6 +467,24 @@
 						<goals>
 							<goal>site</goal>
 							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Optionally initializes & configures the macro (in particular adds support for multimodule projects ) -->
+			<!-- This also fixes the basedir issue in multimodule builds (see http://jira.codehaus.org/browse/DOXIA-373) -->
+			<plugin>
+				<groupId>org.tinyjee.dim</groupId>
+				<artifactId>doxia-include-macro</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<id>initialize-doxia-include-macro</id>
+						<!-- Use "initialize" when the 'site' was not given as 'phase'. -->
+						<!-- phase>initialize</phase -->
+						<phase>pre-site</phase>
+						<goals>
+							<goal>initialize</goal>
 						</goals>
 					</execution>
 				</executions>

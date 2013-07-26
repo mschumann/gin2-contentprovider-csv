@@ -1,0 +1,35 @@
+ -----
+ Repositories
+ -----
+
+Supported Repositories
+
+ The projects goal is to support a wide range of repositories where files can be located.
+    
+* Filesystem
+
+ Support files from a local filesystem. This could be a local disk or a mounted network drive.
+ 
+* CMIS Enterprise Content Management Systems
+
+ <Under Development>
+ 
+ Support Enterprise Content Management Systems that supports the server side {{{http://www.oasis-open.org/committees/cmis/}CMIS}} standard.
+ 
+ The server side {{{http://www.oasis-open.org/committees/cmis/}CMIS}} standard is supported by:
+ 
+ * Microsoft Sharepoint Server 2010
+ 
+ * IBM FileNet 5.0
+ 
+ * Lotus Connections Files 3.0
+ 
+ * {{{http://en.wikipedia.org/wiki/Content_Management_Interoperability_Services#List_of_implementations}and others}}
+ 
+ []
+ 
+
+* Planned
+
+ Further repositories like JCR, FTP, Webdav, etc. are planned.
+ 

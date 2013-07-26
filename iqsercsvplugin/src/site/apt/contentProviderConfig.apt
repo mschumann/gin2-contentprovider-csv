@@ -1,0 +1,243 @@
+ -----
+ Content Provider Configuration
+ -----
+
+File Content Provider Configuration
+
+* Purpose
+
+ The purpose of the document is to describe how the main features of the File System Content Provider and the IMAP Content Provider are implemented and what the configuration parameters necessary for the system are.
+  
+* iQser Configuration entry
+
+%{include|source=src/site/apt/snippets/iqser_config_snippet.xml|snippet=#iqser_config|verbatim=true|show-gutter=false|highlight-theme=eclipse}
+ 
+* Feature implementation and Configuration
+
+ The URL of the file system content represents the location of the file on the hard disk together with the name of the file.
+
+* Synchronization with file system with configuration options
+
+ The system synchronizes the object graph with a folder from the file system specified in the iQser configuration file. The configuration file specified also the type of files that should be taken in consideration and also the sub-folders of the folder that should be included or excluded from the synchronization.
+ 
+%{include|source=src/site/apt/snippets/iqser_config_snippet.xml|snippet=#config_opts|verbatim=true|show-gutter=false|highlight-theme=eclipse}
+  
+ <<doHousekeeping>>
+  
+ This action will delete the content object if the corresponding file is no longer on the file system.
+  
+ <<doSynchronization>>
+  
+ This action will add or update a content object on new or changed files on the local disk.
+  
+ <<Explained>>
+  
+ The folders that are taken in consideration are folder1 and folder2 from the d: drive. The files that are taken in consideration are the plain text files and the zip archives (also the plain text files from the zip archive). The folders that are included in the process are the included1 and included2 from the folders that are taken in consideration and the excluded folders are the excluded1 and excluded2 from the folders that are taken in consideration. There can be any number of filters for files or folders.
+ 
+* Building Content Objects including metadata extraction
+
+  The content objects that can be built are the ones specified in the requirements document. These are the attributes that are extracted for each document type that has been tested. The attributes are the ones extracted by Tika or using the PDF and RTF library.
+
+ <<EXCEL Document Attributes>>
+ 
+   * FILENAME
+    
+   * Title
+    
+   * CONTENT
+    
+   * Last-Save-Date
+   
+   * Manager
+   
+   * Comments
+   
+   * Keywords
+   
+   * Author
+   
+   * Category
+   
+   * Content-Type
+   
+   * Company
+   
+   * subject
+   
+   * Last-Author 
+   
+ <<ODF Document Attributes>>
+
+   * FILENAME
+   
+   * Title
+   
+   * CONTENT
+   
+   * Keywords
+   
+   * Content-Type
+   
+   * date
+   
+   * Creation-Date
+   
+   * nbWord
+   
+   * subject
+   
+   * Edit-Time
+   
+   * generator
+   
+   * nbPage
+   
+   * nbCharacter
+   
+   * editing-cycles
+   
+ <<PPT Document Attributes>>
+
+   * FILENAME
+  
+   * Title
+  
+   * CONTENT
+  
+   * Word-Count
+  
+   * Manager
+  
+   * Revision-Number
+  
+   * Author
+  
+   * Keywords
+  
+   * Content-Type
+  
+   * Last-Author
+  
+   * Last-Printed
+  
+   * Slide-Count
+  
+   * Last-Save-Date
+  
+   * Comments
+  
+   * Creation-Date
+  
+   * Category
+  
+   * Company
+  
+   * subject
+  
+   * Edit-Time
+  
+ <<DOC Document Attributes>>
+
+   * FILENAME
+  
+   * Title
+  
+   * CONTENT
+  
+   * Word-Count
+  
+   * Manager
+  
+   * Template
+  
+   * Revision-Number
+  
+   * Author
+  
+   * Keywords
+  
+   * Content-Type
+  
+   * Last-Author
+  
+   * Character Count
+  
+   * Page-Count
+  
+   * Last-Printed
+  
+   * Last-Save-Date
+  
+   * Comments
+  
+   * Creation-Date
+  
+   * Category
+  
+   * Company
+  
+   * subject
+  
+   * Edit-Time
+  
+ <<RTF Document Attributes>>
+
+   * FILENAME
+   
+   * Title
+   
+   * CONTENT 
+
+ <<Text Document Attributes>>
+
+   * FILENAME
+   
+   * Title
+   
+   * CONTENT
+    
+ <<PDF Document Attributes>>
+
+   * FILENAME
+   
+   * Title
+   
+   * CONTENT
+   
+   * Author 
+
+ <<TXT Document Atrributes>>
+
+   * FILENAME
+   
+   * Title 
+
+* Implementing getBinaryData
+
+  There are 2 different ways for extracting the binary content of content. The first type is for extracting the binary content for files that are not packed while the other one is for zip files. The URL of the zip file is:
+      
+%{include|source=src/site/apt/snippets/general.snippet|snippet=#zip|verbatim=true|show-gutter=false|highlight-theme=eclipse}
+
+* Implementing Method for reading Files as InputStream: getContent(InputStream)
+
+  This method is implemented only for files that are not archived. It creates a FileContent object from an input stream. It also modifies the key attributes from the initial content using the configuration from iQser configuration file. It also maps the initial attributes with the ones specified in the iQser configuration file.
+  
+* Optional configuration for Key Attributes and Attribute Name Mapping
+
+  The attributes that are specified in the key-attributes param-name are the new key-attributes of the content. The rest of the attributes are false.     
+
+%{include|source=src/site/apt/snippets/iqser_config_snippet.xml|snippet=#init1|verbatim=true|show-gutter=false|highlight-theme=eclipse}
+
+  This example of configuration file specifies that the key-attributes are the Title and the Author. The rest of the attributes are non-key attributes. 
+  
+%{include|source=src/site/apt/snippets/iqser_config_snippet.xml|snippet=#init2|verbatim=true|show-gutter=false|highlight-theme=eclipse}
+
+  The content new attributes will be Autor instead of AUTHOR, Autor instead of Last-Author, Bezeichnung instead of title or TITLE. 
+
+* Implementing Actions for delete a file
+
+  This operation deletes the content from the object graph and also from the file system. This feature is available also for files that are contained in a zip archive.
+
+* Implementing Actions for saving a file
+
+  This operation updates or creates a file and a file content object. This feature is available also for files that are contained in a zip archive. The content is added to the object graph or updated if it already exists. If the file cannot be saved an exception is thrown and the content object is not saved. 
