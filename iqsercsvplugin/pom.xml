@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.sf.iqser.plugin.csv</groupId>
@@ -127,7 +126,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>iqser_release</id>
@@ -260,8 +259,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8.1</version>
+				<version>2.9.1</version>
 				<executions>
+					<execution>
+						<id>javadoc-site</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>javadoc</goal>
+						</goals>
+					</execution>
 					<execution>
 						<id>javadoc-jar</id>
 						<phase>package</phase>
@@ -306,7 +312,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-			<dependencies>
+				<dependencies>
 					<dependency>
 						<groupId>ant</groupId>
 						<artifactId>ant-jsch</artifactId>
@@ -327,9 +333,7 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-								<copy
-									file="${project.build.directory}/${project.build.finalName}.zip"
-									tofile="${project.build.directory}/${project.build.finalName}.gin" />
+								<copy file="${project.build.directory}/${project.build.finalName}.zip" tofile="${project.build.directory}/${project.build.finalName}.gin" />
 							</target>
 						</configuration>
 						<goals>
@@ -345,10 +349,8 @@
 						<configuration>
 							<target>
 								<echo message="Preparing ginplugin.xml" />
-								<copy failonerror="true"
-									file="${basedir}/src/main/assembly/ginplugin.xml" tofile="${basedir}/target/generated-resources/ginplugin.xml" />
-								<replace file="${basedir}/target/generated-resources/ginplugin.xml"
-									token="###VERSION###" value="${project.version}" />
+								<copy failonerror="true" file="${basedir}/src/main/assembly/ginplugin.xml" tofile="${basedir}/target/generated-resources/ginplugin.xml" />
+								<replace file="${basedir}/target/generated-resources/ginplugin.xml" token="###VERSION###" value="${project.version}" />
 							</target>
 						</configuration>
 					</execution>
@@ -360,8 +362,7 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<scp todir="${sourceforge.upload}" password="${sf.password}"
-									trust="true">
+								<scp todir="${sourceforge.upload}" password="${sf.password}" trust="true">
 									<fileset dir="${project.build.directory}">
 										<include name="${project.build.finalName}*.gin" />
 									</fileset>
@@ -457,8 +458,8 @@
 					</dependency>
 				</dependencies>
 				<executions>
-				<execution>
-					<id>deploy_site</id>
+					<execution>
+						<id>deploy_site</id>
 						<phase>deploy</phase>
 						<goals>
 							<goal>site</goal>
@@ -468,7 +469,7 @@
 				</executions>
 			</plugin>
 		</plugins>
-		
+
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
@@ -479,11 +480,10 @@
 				<artifactId>wagon-ssh</artifactId>
 			</extension>
 		</extensions>
-		
+
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -493,12 +493,22 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-pmd-plugin
-										</artifactId>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-javadoc-plugin</artifactId>
+										<versionRange>[2.9.1,)</versionRange>
+										<goals>
+											<goal>javadoc</goal>
+											<goal>aggregate-jar</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-pmd-plugin</artifactId>
 										<versionRange>[2.7,)</versionRange>
 										<goals>
 											<goal>cpd-check</goal>
@@ -579,7 +589,9 @@
 				<version>2.4.3</version>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
 				<configuration>
 					<aggregate>true</aggregate>
 				</configuration>
@@ -597,11 +609,6 @@
 				<configuration>
 					<tags>TODO, @todo, FIXME, DOCUMENT ME</tags>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.7</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
