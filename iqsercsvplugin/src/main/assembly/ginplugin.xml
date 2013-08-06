@@ -3,13 +3,12 @@
 	xsi:schemaLocation="http://www.iqser.com/schema/ginplugin/2.0 http://www.iqser.com/schema/ginplugin/2.0/ginplugin.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.iqser.com/schema/ginplugin/2.0">
 
-	<name>CSV Content Provider</name>
+	<name>iQser CSV-Content-Provider</name>
 	<vendor>iQser GmbH</vendor>
 	<version>###VERSION###</version>
 
 	<description>
-		This ContentProvider plugin is able to connect to a file repository 
-		with CMIS support and provided files as Content objects to the iQser GIN Server.
+		iQser CSV-Content-Provider
 	</description>
 
 	<classname type="ContentProvider">
