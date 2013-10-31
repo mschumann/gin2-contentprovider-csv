@@ -27,18 +27,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.lucene.queryParser.QueryParser;
 
 import com.csvreader.CsvReader;
 import com.iqser.core.exception.IQserException;
 import com.iqser.core.model.Attribute;
 import com.iqser.core.model.Content;
 import com.iqser.core.model.Parameter;
+import com.iqser.core.model.Result;
 import com.iqser.core.plugin.provider.AbstractContentProvider;
 
 /**
@@ -386,24 +389,131 @@ public class CsvContentProvider extends AbstractContentProvider {
 				Content content = createContent(contentUrl);
 				try {
 					if (isExistingContent(contentUrl)) {
-						LOG.info(String.format("Invoking %s#updateContent() for ContentURL: %s ...", this.getClass()
-								.getSimpleName(), contentUrl));
-						updateContent(content);
+						if (isModifiedContent(content)) {
+							LOG.info(String.format("Invoking %s#updateContent() for ContentURL: %s ...", this
+									.getClass().getSimpleName(), contentUrl));
+							updateContent(content);
+						} else {
+							LOG.info(String.format("Skipping unmodified content: %s", contentUrl));
+						}
 					} else {
 						LOG.info(String.format("Invoking %s#addContent() for ContentURL: %s ...", this.getClass()
 								.getSimpleName(), contentUrl));
 						addContent(content);
 					}
-					// Let the application container take a breath and sleep for
-					// 0,1 second.
-					Thread.sleep(100);
 				} catch (IQserException e) {
 					LOG.error(String.format("Unexpected error while trying to add or update content: %s", contentUrl),
 							e);
-				} catch (InterruptedException e) {
-					LOG.warn("Could not sleep well :(");
 				}
 			}
+		}
+	}
+
+	private boolean isModifiedContent(Content content) throws IQserException {
+
+		if (0 > modificationDateColumn) {
+			// modification all content objects is equal -> content comparison is necessary
+			return !equalIgnoringModificationDate(content, getExistingContent(content.getContentUrl()));
+		} else {
+			String query = String.format("+%s:\"%s\" +%s:\"%s\"", Content.CONTENT_FIELD_PROVIDER,
+					QueryParser.escape(getName()), Content.CONTENT_FIELD_URL,
+					QueryParser.escape(content.getContentUrl()));
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("isModifiedContent: query = " + query);
+			}
+
+			Collection<Result> results = search(query);
+			if (null != results && 0 < results.size()) {
+				Result result = results.iterator().next();
+				if (LOG.isDebugEnabled()) {
+					LOG.debug(String.format("isModifiedContent: comparing modification dates (%s, %s)",
+							result.getModificationDate(), content.getModificationDate()));
+				}
+				return content.getModificationDate() > result.getModificationDate();
+			}
+			return false;
+		}
+
+	}
+
+	/**
+	 * Checks if the new content and the old content are different.
+	 * 
+	 * @param Content
+	 *            contentNew
+	 * @param Content
+	 *            contentOld
+	 * @return boolean
+	 */
+	protected static boolean equalIgnoringModificationDate(Content content, Content other) {
+		if (content == other) {
+			// objects are identical or both null
+			return true;
+		} else {
+			if (content == null || other == null) {
+				return false;
+			}
+
+			if (other.getContentUrl() == null && content.getContentUrl() != null) {
+				return false;
+			}
+			if (other.getContentUrl() != null && !other.getContentUrl().equals(content.getContentUrl())) {
+				return false;
+			}
+
+			if (other.getProvider() == null && content.getProvider() != null) {
+				return false;
+			}
+			if (other.getProvider() != null && !other.getProvider().equals(content.getProvider())) {
+				return false;
+			}
+
+			if (other.getType() == null && content.getType() != null) {
+				return false;
+			}
+			if (other.getType() != null && !other.getType().equals(content.getType())) {
+				return false;
+			}
+
+			if (other.getFulltext() == null && content.getFulltext() != null) {
+				return false;
+			}
+			if (other.getFulltext() != null && !other.getFulltext().equals(content.getFulltext())) {
+				return false;
+			}
+
+			// Check the contents attributes
+			if (other.getAttributes() == null && content.getAttributes() != null) {
+				return false;
+			}
+			if (other.getAttributes() != null && content.getAttributes() == null) {
+				return false;
+			}
+			if (other.getAttributes().size() != content.getAttributes().size()) {
+				return false;
+			}
+
+			Iterator<Attribute> iteratorContent = content.getAttributes().iterator();
+			while (iteratorContent.hasNext()) {
+				Attribute attr = iteratorContent.next();
+
+				boolean hasFound = false;
+
+				Iterator<Attribute> iteratorContentB = other.getAttributes().iterator();
+				while (iteratorContentB.hasNext()) {
+					Attribute attrB = iteratorContentB.next();
+					if (attr.equals(attrB)) {
+						hasFound = true;
+						break;
+					}
+				}
+
+				if (!hasFound) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 
@@ -440,7 +550,8 @@ public class CsvContentProvider extends AbstractContentProvider {
 	 */
 	@Override
 	public Content createContent(String contentUrl) {
-		LOG.info(String.format("Invoking %s#getContent(String url) ...", this.getClass().getSimpleName()));
+		LOG.info(String.format("Invoking %s#createContent(%s) ...", this.getClass().getSimpleName(), contentUrl));
+
 		if (0 == contentMap.size()) {
 			getContentUrls();
 		}
