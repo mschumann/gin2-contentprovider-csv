@@ -16,23 +16,19 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		contents = new ArrayList<Content>();
 	}
 
-	public Collection<Content> getExistingContents(String arg0)
-			throws IQserException {
-
-		Collection<Content> col = new ArrayList<Content>();
-		col.addAll(contents);
-
-		return col;
+	@Override
+	public Collection<Content> getExistingContents(String arg0) throws IQserException {
+		return new ArrayList<Content>(contents);
 	}
 
-	public boolean isExistingContent(String arg0, String arg1)
-			throws IQserException {
+	@Override
+	public boolean isExistingContent(String arg0, String arg1) throws IQserException {
 		Iterator<Content> cIter = contents.iterator();
 
 		while (cIter.hasNext()) {
 			Content c = cIter.next();
 
-			if (c.getContentUrl().equalsIgnoreCase(arg1)) {
+			if (c.getContentUrl().equals(arg1)) {
 				return true;
 			}
 		}
@@ -40,26 +36,37 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		return false;
 	}
 
+	@Override
 	public void removeContent(String arg0, String arg1) throws IQserException {
 		Iterator<Content> cIter = contents.iterator();
 
 		while (cIter.hasNext()) {
 			Content c = cIter.next();
 
-			if (c.getContentUrl().equalsIgnoreCase(arg1)) {
+			if (c.getContentUrl().equals(arg1)) {
 				contents.remove(c);
 				break;
 			}
 		}
 	}
 
+	@Override
 	public void addContent(Content arg0) throws IQserException {
 		contents.add(arg0);
 	}
 
-	public Content getExistingContent(String arg0, String arg1)
-			throws IQserException {
-		// TODO Auto-generated method stub
+	@Override
+	public Content getExistingContent(String arg0, String arg1) throws IQserException {
+		Iterator<Content> cIter = contents.iterator();
+
+		while (cIter.hasNext()) {
+			Content c = cIter.next();
+
+			if (c.getContentUrl().equals(arg1)) {
+				return c;
+			}
+		}
+
 		return null;
 	}
 
@@ -68,7 +75,7 @@ public class MockContentProviderFacade implements ContentProviderFacade {
 		Iterator<Content> cIter = contents.iterator();
 		while (cIter.hasNext()) {
 			Content c = cIter.next();
-			if (c.getContentUrl().equalsIgnoreCase(arg0.getContentUrl())) {
+			if (c.getContentUrl().equals(arg0.getContentUrl())) {
 				contents.remove(c);
 				contents.add(arg0);
 				break;
