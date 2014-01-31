@@ -8,6 +8,6 @@ import com.iqser.core.plugin.provider.ContentProvider;
 
 public interface ActionRunner {
 
-	public abstract void run(Collection<Parameter> parameters, Content content, ContentProvider provider);
+	void run(Collection<Parameter> parameters, Content content, ContentProvider provider);
 
 }
