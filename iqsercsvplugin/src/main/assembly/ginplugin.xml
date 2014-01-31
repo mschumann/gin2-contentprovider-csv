@@ -61,5 +61,10 @@
 		<param name="recordAsFulltext" type="String" optional="true">
 			If 'true' and if 'column.fulltext' equals '-1', the raw record without delimeters is used as fulltext.
 		</param>
+		
+		<param name="column.modificationDate" type="String" optional="true">
+			Zero based number of the column with the row's modification timestamp; 
+			default is -1 (not specified)
+		</param>
 	</params>
 </ginplugin>

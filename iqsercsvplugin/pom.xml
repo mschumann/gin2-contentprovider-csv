@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.sf.iqser.plugin.csv</groupId>
 	<artifactId>iqsercsvplugin</artifactId>
-	<version>2.0-SNAPSHOT</version>
+	<version>2.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>CSV ContentProvider for iQser GIN</name>
@@ -85,7 +86,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<iqser.version>2.0</iqser.version>
+		<iqser.version>2.1.0.51-SNAPSHOT</iqser.version>
 		<compileSource>1.6</compileSource>
 		<sourceforge.artifact>${project.build.directory}/${project.build.finalName}</sourceforge.artifact>
 		<sourceforge.upload>${sf.username},${project.artifactId}@frs.sourceforge.net:/home/pfs/project/i/iq/${project.artifactId}</sourceforge.upload>
@@ -640,27 +641,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
+			<groupId>com.iqser.gin.developer</groupId>
+			<artifactId>plugin-test-api</artifactId>
+			<version>${iqser.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.7</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.javacsv</groupId>
 			<artifactId>javacsv</artifactId>
 			<version>2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>jmock</groupId>
-			<artifactId>jmock</artifactId>
-			<version>1.1.0</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
