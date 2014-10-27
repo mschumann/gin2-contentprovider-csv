@@ -24,20 +24,28 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
@@ -75,6 +83,9 @@ public class CsvContentProvider extends AbstractContentProvider {
 	private static final String CSV_PROPERTY_FULLTEXTCOLUMN = "column.fulltext";
 	private static final String CSV_PROPERTY_CONTENT_TYPE = "content.type";
 	private static final String CSV_PROPERTY_RECORDASFULLTEXT = "recordAsFulltext";
+	public static final String CSV_PROPERTY_CONTENTURLASHASHEDRECORD = "contenUrlAsHashFromRecord";
+	public static final String CSV_PROPERTY_DIGESTALGORITHMFORCONTENTURLASHASHEDRECORD = "contenUrlAsHashFromRecordDigestAlgorithm";
+	public static final String CSV_PROPERTY_MULTIVALUEDELIMITERS = "multiValueDelimiters";
 
 	public static final String CSV_DEFAULT_DELIMETER = ";";
 	public static final String CSV_DEFAULT_CHARSET = "UTF-8";
@@ -88,6 +99,8 @@ public class CsvContentProvider extends AbstractContentProvider {
 	public static final String CSV_DEFAULT_FULLTEXTCOLUMN = "-1";
 	public static final String CSV_DEFAULT_TYPE = "CSV Data";
 	public static final String CSV_DEFAULT_RECORDASFULLTEXT = "false";
+	public static final String CSV_DEFAULT_CONTENTURLASHASHEDRECORD = "false";
+	public static final String CSV_DEFAULT_DIGESTALGORITHMFORCONTENTURLASHASHEDRECORD = "SHA-1";
 
 	public static final String CSV_CONTENT_URI_BASE = "iqser://iqsercsvplugin.sf.net";
 
@@ -100,7 +113,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	private char delimeter;
 
 	/* Zero-based list of columns that will be used as composite id. */
-	private List<Integer> idColumns;
+	private List<Integer> idColumns = Collections.emptyList();
 
 	/*
 	 * If TRUE, the value of the ID column will be used as ContentUrl, else an artificial URI will be generated.
@@ -137,6 +150,23 @@ public class CsvContentProvider extends AbstractContentProvider {
 	private int modificationDateColumn = -1;
 
 	private boolean recordAsFulltext = false;
+
+	/*
+	 * If true, the contentUrl is built with a hash code, which is computed
+	 * using the current CSV record.
+	 */
+	private boolean contenUrlAsHashFromRecord = false;
+
+	/*
+	 * Message digest, to compute contentUrls from raw CSV records.
+	 */
+	private MessageDigest digestForContenUrlAsHashFromRecord;
+
+	
+	/*
+	 * Mapping from column numbers to multiValue delimiters.
+	 */
+	private Map<Integer,Pattern> multiValueDelimiters = Collections.emptyMap();
 
 	protected Map<String, Content> getContentMap() {
 		return contentMap;
@@ -223,29 +253,42 @@ public class CsvContentProvider extends AbstractContentProvider {
 					charsetParamValue, charset.displayName()));
 		}
 
-		// Setting the zero-based list of numbers of the id-columns.
-		String idColumnsParamValue = getInitParams().getProperty(CSV_PROPERTY_IDCOLUMNS);
-		if (StringUtils.isBlank(idColumnsParamValue)) {
-			idColumnsParamValue = getInitParams().getProperty(CSV_PROPERTY_IDCOLUMN, CSV_DEFAULT_IDCOLUMN);
-		}
-		if (StringUtils.isBlank(idColumnsParamValue)) {
-			idColumnsParamValue = CSV_DEFAULT_IDCOLUMN;
-		}
-		String[] idColumnStrings = idColumnsParamValue.split(",");
-		idColumns = new ArrayList<Integer>();
-		for (int i = 0; i < idColumnStrings.length; i++) {
+		contenUrlAsHashFromRecord = Boolean.parseBoolean(getInitParams().getProperty(CSV_PROPERTY_CONTENTURLASHASHEDRECORD, CSV_DEFAULT_CONTENTURLASHASHEDRECORD));
+		LOG.debug("Init param: contenUrlAsHashFromRecord = " + contenUrlAsHashFromRecord);
+		
+		if (contenUrlAsHashFromRecord) {
+			String digestAlgorithmParam = getInitParams().getProperty(CSV_PROPERTY_DIGESTALGORITHMFORCONTENTURLASHASHEDRECORD, CSV_DEFAULT_DIGESTALGORITHMFORCONTENTURLASHASHEDRECORD);
+			LOG.debug("Init param: contenUrlAsHashFromRecordDigestAlgorithm = " + digestAlgorithmParam);
 			try {
-				if (StringUtils.isNotBlank(idColumnStrings[i])) {
-					idColumns.add(i, Integer.parseInt(idColumnStrings[i].trim()));
-				}
-			} catch (NumberFormatException e) {
-				LOG.error("Could not identify id column for value: '" + idColumnStrings[i]
-						+ "'\nList of id columns is corrupted!", e);
-				throw e;
+				digestForContenUrlAsHashFromRecord = MessageDigest.getInstance(digestAlgorithmParam);
+			} catch (NoSuchAlgorithmException e) {
+				throw new IllegalStateException("Digest algorithm for content url computation could not be instantiated", e);
 			}
+			idColumns = Collections.emptyList();
 		}
-		LOG.debug("Init param: idColumns = " + idColumnsParamValue);
-
+		else {
+			// Setting the zero-based list of numbers of the id-columns.
+			String idColumnsParamValue = getInitParams().getProperty(CSV_PROPERTY_IDCOLUMNS);
+			if (StringUtils.isBlank(idColumnsParamValue)) {
+				idColumnsParamValue = getInitParams().getProperty(CSV_PROPERTY_IDCOLUMN, CSV_DEFAULT_IDCOLUMN);
+			}
+			if (StringUtils.isBlank(idColumnsParamValue)) {
+				idColumnsParamValue = CSV_DEFAULT_IDCOLUMN;
+			}
+			String[] idColumnStrings = idColumnsParamValue.split(",");
+			idColumns = new ArrayList<Integer>();
+			for (int i = 0; i < idColumnStrings.length; i++) {
+				try {
+					if (StringUtils.isNotBlank(idColumnStrings[i])) {
+						idColumns.add(i, Integer.parseInt(idColumnStrings[i].trim()));
+					}
+				} catch (NumberFormatException e) {
+					LOG.error("Could not identify id column for value: '" + idColumnStrings[i] + "'\nList of id columns is corrupted!", e);
+					throw e;
+				}
+			}
+			LOG.debug("Init param: idColumns = " + idColumnsParamValue);
+		}
 		// Setting the boolean idAsContentUrl-flag.
 		idAsContentUrl = Boolean.parseBoolean(getInitParams().getProperty(CSV_PROPERTY_IDASCONTENTURL,
 				CSV_DEFAULT_IDASCONTENTURL));
@@ -343,6 +386,27 @@ public class CsvContentProvider extends AbstractContentProvider {
 		modified = true;
 		contentMap = new HashMap<String, Content>();
 
+		String multiValueDelimitersParam = getInitParams().getProperty(CSV_PROPERTY_MULTIVALUEDELIMITERS);
+		LOG.debug("Init param: multiValueDelimiters = " + multiValueDelimitersParam);
+		
+		if(StringUtils.isNotBlank(multiValueDelimitersParam)) {
+			try {
+				@SuppressWarnings("unchecked")
+				Map<String, String> multiValueDelimitersAsStrings = new ObjectMapper().readValue(multiValueDelimitersParam, Map.class);
+				multiValueDelimiters = new HashMap<Integer, Pattern>();
+				for (Entry<String, String> entry : multiValueDelimitersAsStrings.entrySet()) {
+					Integer columnNumber = Integer.valueOf(entry.getKey());
+					Pattern delimiter = Pattern.compile(entry.getValue());
+					multiValueDelimiters.put(columnNumber, delimiter);
+				}
+			} catch (JsonParseException e) {
+				throw new IllegalArgumentException("Could not read multiValueDelimiters", e);
+			} catch (JsonMappingException e) {
+				throw new IllegalArgumentException("Could not read multiValueDelimiters", e);
+			} catch (IOException e) {
+				throw new IllegalArgumentException("Could not read multiValueDelimiters", e);
+			}
+		}
 	}
 
 	private long getCachedFileModificationTimestamp() {
@@ -649,7 +713,6 @@ public class CsvContentProvider extends AbstractContentProvider {
 			LOG.debug(String.format("Building content object of type '%s'.", contentType));
 		}
 
-		String fulltext = null;
 		for (Column column : columns) {
 			Attribute attribute = getAttributeFromCurrentColumnOfCurrentRecord(column, csvReader);
 
@@ -672,29 +735,41 @@ public class CsvContentProvider extends AbstractContentProvider {
 				}
 
 				if (column.isFulltextColumn()) {
-					fulltext = attributeValue;
+					content.setFulltext(attributeValue);
 				} else {
 					// empty attributes, the fulltext attribute (if present) and those that should
 					// be ignored are not added to the content object
 					Attribute existingAttribute = content.getAttributeByName(attribute.getName());
 					if (null != existingAttribute) {
-						existingAttribute.addValue(attributeValue);
+						for (String value : attribute.getValues()) {
+							existingAttribute.addValue(value);
+						}
 					} else {
 						content.addAttribute(attribute);
 					}
 				}
-
 			} // end if attribute value is not blank
 		} // end for
-
-		// set fulltext
-		if (null == fulltext && recordAsFulltext) {
-			content.setFulltext(csvReader.getRawRecord().replace(delimeter, ' '));
-		} else {
-			content.setFulltext(fulltext);
+		
+		if(contenUrlAsHashFromRecord || recordAsFulltext) {
+			String rawRecord = csvReader.getRawRecord();
+			
+			//compute hash and set contenturl
+			if (contenUrlAsHashFromRecord) {
+				content.setContentUrl(createContentUrlWithHashFromRawRecord(rawRecord));
+			}
+	
+			// set fulltext
+			if (null == content.getFulltext() && recordAsFulltext) {
+				content.setFulltext(rawRecord.replace(delimeter, ' '));
+			}
 		}
-
 		return content;
+	}
+
+	private String createContentUrlWithHashFromRawRecord(String rawRecord) throws UnsupportedEncodingException {
+		byte[] digest = digestForContenUrlAsHashFromRecord.digest(rawRecord.getBytes());
+		return createContentUrl(null, digestForContenUrlAsHashFromRecord.getAlgorithm(), String.valueOf(Hex.encodeHex(digest)));
 	}
 
 	protected long extractModifactionDate(String attributeValue) {
@@ -743,8 +818,15 @@ public class CsvContentProvider extends AbstractContentProvider {
 
 			attribute = new Attribute();
 			attribute.setName(column.getAttributeName());
-			attribute.addValue(attributeValue);
-
+			
+			if(null == column.getMultiValueDelimiter()) {
+				attribute.addValue(attributeValue);
+			} else {
+				String[] multiValues = column.getMultiValueDelimiter().split(attributeValue);
+				for (String value : multiValues) {
+					attribute.addValue(value);
+				}
+			}
 			if (column.isTimestampColumn()) {
 				attribute.setType(Attribute.ATTRIBUTE_TYPE_DATE);
 			} else {
@@ -774,16 +856,19 @@ public class CsvContentProvider extends AbstractContentProvider {
 		for (int i = 0; i < headerCount; i++) {
 
 			String columnName = csvReader.getHeader(i);
-			if (!ignoreColumns.contains(Integer.valueOf(i)) && StringUtils.isNotBlank(columnName)) {
+			Integer columnNumber = Integer.valueOf(i);
+			if (!ignoreColumns.contains(columnNumber) && StringUtils.isNotBlank(columnName)) {
 				Column column = new Column(i, columnName);
 
-				column.setKeyColumn(keyColumns.contains(Integer.valueOf(i)));
-				column.setTimestampColumn(timestampColumns.contains(Integer.valueOf(i)));
-				column.setIdColumn(idColumns.contains(Integer.valueOf(i)));
+				column.setKeyColumn(keyColumns.contains(columnNumber));
+				column.setTimestampColumn(timestampColumns.contains(columnNumber));
+				column.setIdColumn(idColumns.contains(columnNumber));
 
 				column.setNameColumn(i == nameColumn);
 				column.setFulltextColumn(i == fulltextColumn);
 				column.setModifiedDateColumn(i == modificationDateColumn);
+				
+				column.setMultiValueDelimiter(multiValueDelimiters.get(columnNumber));
 
 				columns.add(column);
 			}
@@ -957,6 +1042,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 		private boolean idColumn = false;
 		private boolean fulltextColumn = false;
 		private boolean nameColumn = false;
+		private Pattern multiValueDelimiter;
 
 		public Column(int index, String name) {
 			this.index = index;
@@ -1031,6 +1117,13 @@ public class CsvContentProvider extends AbstractContentProvider {
 		public void setNameColumn(boolean nameColumn) {
 			this.nameColumn = nameColumn;
 		}
-
+		
+		public void setMultiValueDelimiter(Pattern multiValueDelimiter) {
+			this.multiValueDelimiter = multiValueDelimiter;
+		}
+		
+		public Pattern getMultiValueDelimiter() {
+			return multiValueDelimiter;
+		}
 	}
 }
