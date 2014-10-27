@@ -162,7 +162,6 @@ public class CsvContentProvider extends AbstractContentProvider {
 	 */
 	private MessageDigest digestForContenUrlAsHashFromRecord;
 
-	
 	/*
 	 * Mapping from column numbers to multiValue delimiters.
 	 */
