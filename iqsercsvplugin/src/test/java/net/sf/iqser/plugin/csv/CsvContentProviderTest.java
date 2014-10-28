@@ -161,6 +161,29 @@ public class CsvContentProviderTest extends ContentProviderTestCase {
 	}
 
 	@Test
+	public void testContentUrlAsHashFromRecord_SHA1() throws IOException, URISyntaxException, IQserException {
+		provider.getInitParams().setProperty(CsvContentProvider.CSV_PROPERTY_CONTENTURLASHASHEDRECORD, "true");
+		provider.init();
+
+		String expectedContentUrl = "iqser://iqsercsvplugin.sf.net/artwork?SHA-1=fdf004282e243a3cbe13433bbe434d40ef85bf25";
+		Content c1 = provider.createContent(expectedContentUrl);
+		Assert.assertNotNull(c1);
+		Assert.assertEquals(expectedContentUrl, c1.getContentUrl());
+	}
+	
+	@Test
+	public void testContentUrlAsHashFromRecord_MD5() throws IOException, URISyntaxException, IQserException {
+		provider.getInitParams().setProperty(CsvContentProvider.CSV_PROPERTY_CONTENTURLASHASHEDRECORD, "true");
+		provider.getInitParams().setProperty(CsvContentProvider.CSV_PROPERTY_DIGESTALGORITHMFORCONTENTURLASHASHEDRECORD, "MD5");
+		provider.init();
+
+		String expectedContentUrl = "iqser://iqsercsvplugin.sf.net/artwork?MD5=f027b23812428478e4ec5ab56ca3f962";
+		Content c1 = provider.createContent(expectedContentUrl);
+		Assert.assertNotNull(c1);
+		Assert.assertEquals(expectedContentUrl, c1.getContentUrl());
+	}
+	
+	@Test
 	public void testUpdateCsv() throws IOException, URISyntaxException, IQserException {
 		File originalFile = new File(getClass().getClassLoader().getResource("artcollection.csv").toURI());
 		File tempCsvFile = File.createTempFile("content-provider-test-", ".csv");
@@ -186,6 +209,44 @@ public class CsvContentProviderTest extends ContentProviderTestCase {
 
 		Content c2 = contentProviderFacade.getExistingContent(provider.getName(), "5");
 		Assert.assertTrue("Bruce McLean".equals(c2.getAttributeByName("ARTIST").getValue()));
+	}
+	
+	@Test
+	public void testReadMultiValuesAsMultiValues() throws IOException, URISyntaxException, IQserException {
+		provider.getInitParams().setProperty("file", getClass().getClassLoader().getResource("multiValueTest.csv").toString());
+		provider.getInitParams().setProperty(CsvContentProvider.CSV_PROPERTY_MULTIVALUEDELIMITERS, "{\"1\":\",\"}");
+		provider.init();
+
+		Content c1 = provider.createContent("0");
+		Assert.assertNotNull(c1);
+		Assert.assertNotNull(c1.getAttributeByName("VALUES"));
+		Assert.assertTrue(c1.getAttributeByName("VALUES").isMultiValue());
+		Assert.assertEquals("1||2||3", c1.getAttributeByName("VALUES").getValue());
+	}
+	
+	@Test
+	public void testReadMultiValuesAsSingleValues() throws IOException, URISyntaxException, IQserException {
+		provider.getInitParams().setProperty("file", getClass().getClassLoader().getResource("multiValueTest.csv").toString());
+		provider.init();
+
+		Content c1 = provider.createContent("0");
+		Assert.assertNotNull(c1);
+		Assert.assertNotNull(c1.getAttributeByName("VALUES"));
+		Assert.assertFalse(c1.getAttributeByName("VALUES").isMultiValue());
+		Assert.assertEquals("1,2,3", c1.getAttributeByName("VALUES").getValue());
+	}
+	
+	@Test
+	public void testReadMultiValuesAsMultiValuesWithWrongDelimiter() throws IOException, URISyntaxException, IQserException {
+		provider.getInitParams().setProperty("file", getClass().getClassLoader().getResource("multiValueTest.csv").toString());
+		provider.getInitParams().setProperty(CsvContentProvider.CSV_PROPERTY_MULTIVALUEDELIMITERS, "{\"1\":\";\"}");
+		provider.init();
+
+		Content c1 = provider.createContent("0");
+		Assert.assertNotNull(c1);
+		Assert.assertNotNull(c1.getAttributeByName("VALUES"));
+		Assert.assertFalse(c1.getAttributeByName("VALUES").isMultiValue());
+		Assert.assertEquals("1,2,3", c1.getAttributeByName("VALUES").getValue());
 	}
 
 	private static void copyFileUsingStream(File source, File dest) throws IOException {

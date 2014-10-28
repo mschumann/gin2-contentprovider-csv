@@ -66,5 +66,17 @@
 			Zero based number of the column with the row's modification timestamp; 
 			default is -1 (not specified)
 		</param>
+		<param name="contenUrlAsHashFromRecord" type="String" optional="true">
+			If 'true', computes a hash over the raw record and uses it as the contentUrl, e.g. iqser://iqsercsvplugin.sf.net/...?SHA-1=fdf004282e243a3cbe13433bbe434d40ef85bf25; 
+			default is 'false'
+		</param>
+		<param name="contenUrlAsHashFromRecordDigestAlgorithm" type="String" optional="true">
+			Digest Algorithm for computing a contentUrl based on a hash;
+			default is 'SHA-1'
+		</param>
+		<param name="multiValueDelimiters" type="String" optional="true">
+			An associative JSON array that contains a mapping from column numbers to multiValue delimiters. A delimiter can be any regular expression;
+			default is '{}'
+		</param>
 	</params>
 </ginplugin>
