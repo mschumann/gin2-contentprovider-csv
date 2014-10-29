@@ -23,7 +23,7 @@
 
 	<scm>
 		<connection>scm:git:https://github.com/iqser-gmbh/gin2-contentprovider-csv.git</connection>
-		<developerConnection>scm:git:git://github.com/iqser-gmbh/gin2-contentprovider-csv.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:iqser-gmbh/gin2-contentprovider-csv.git</developerConnection>
 		<url>https://github.com/iqser-gmbh/gin2-contentprovider-csv</url>
 	</scm>
 
