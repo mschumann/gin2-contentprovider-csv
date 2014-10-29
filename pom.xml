@@ -4,7 +4,7 @@
 
 	<groupId>net.sf.iqser.plugin.csv</groupId>
 	<artifactId>iqsercsvplugin</artifactId>
-	<version>2.2.0</version>
+	<version>2.2.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>CSV ContentProvider for iQser GIN</name>
@@ -24,7 +24,7 @@
 		<connection>scm:git:https://github.com/iqser-gmbh/gin2-contentprovider-csv.git</connection>
 		<developerConnection>scm:git:git@github.com:iqser-gmbh/gin2-contentprovider-csv.git</developerConnection>
 		<url>https://github.com/iqser-gmbh/gin2-contentprovider-csv</url>
-	  <tag>iqsercsvplugin-2.2.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<developers>
