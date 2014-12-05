@@ -86,6 +86,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	public static final String CSV_PROPERTY_CONTENTURLASHASHEDRECORD = "contenUrlAsHashFromRecord";
 	public static final String CSV_PROPERTY_DIGESTALGORITHMFORCONTENTURLASHASHEDRECORD = "contenUrlAsHashFromRecordDigestAlgorithm";
 	public static final String CSV_PROPERTY_MULTIVALUEDELIMITERS = "multiValueDelimiters";
+	public static final String CSV_PROPERTY_FULLTEXTCOLUMNASADDITIONALATTRIBUTE = "fullTextColumnAsAdditionalAttribute";
 
 	public static final String CSV_DEFAULT_DELIMETER = ";";
 	public static final String CSV_DEFAULT_CHARSET = "UTF-8";
@@ -101,6 +102,7 @@ public class CsvContentProvider extends AbstractContentProvider {
 	public static final String CSV_DEFAULT_RECORDASFULLTEXT = "false";
 	public static final String CSV_DEFAULT_CONTENTURLASHASHEDRECORD = "false";
 	public static final String CSV_DEFAULT_DIGESTALGORITHMFORCONTENTURLASHASHEDRECORD = "SHA-1";
+	public static final String CSV_DEFAULT_FULLTEXTCOLUMNASADDITIONALATTRIBUTE = "false";
 
 	public static final String CSV_CONTENT_URI_BASE = "iqser://iqsercsvplugin.sf.net";
 
@@ -166,6 +168,11 @@ public class CsvContentProvider extends AbstractContentProvider {
 	 * Mapping from column numbers to multiValue delimiters.
 	 */
 	private Map<Integer,Pattern> multiValueDelimiters = Collections.emptyMap();
+
+	/*
+	 * If true, the content will contain the full text as full text and as a redundant attribute.
+	 */
+	private boolean fullTextColumnAsAdditionalAttribute = false;
 
 	protected Map<String, Content> getContentMap() {
 		return contentMap;
@@ -304,6 +311,10 @@ public class CsvContentProvider extends AbstractContentProvider {
 		fulltextColumn = Integer.parseInt(StringUtils.isNotBlank(fulltextColumnValue) ? fulltextColumnValue.trim()
 				: CSV_DEFAULT_FULLTEXTCOLUMN);
 		LOG.debug("Init param: fulltextColumn = " + fulltextColumn);
+		
+		fullTextColumnAsAdditionalAttribute = Boolean.parseBoolean(getInitParams().getProperty(CSV_PROPERTY_FULLTEXTCOLUMNASADDITIONALATTRIBUTE,
+				 CSV_DEFAULT_FULLTEXTCOLUMNASADDITIONALATTRIBUTE));
+		LOG.debug("Init param: fullTextColumnAsAdditionalAttribute = " + fullTextColumnAsAdditionalAttribute);
 
 		// Setting the zero-based number of the name-column.
 		String nameColumnValue = getInitParams().getProperty(CSV_PROPERTY_NAMECOLUMN, CSV_DEFAULT_NAMECOLUMN);
@@ -735,17 +746,11 @@ public class CsvContentProvider extends AbstractContentProvider {
 
 				if (column.isFulltextColumn()) {
 					content.setFulltext(attributeValue);
-				} else {
-					// empty attributes, the fulltext attribute (if present) and those that should
-					// be ignored are not added to the content object
-					Attribute existingAttribute = content.getAttributeByName(attribute.getName());
-					if (null != existingAttribute) {
-						for (String value : attribute.getValues()) {
-							existingAttribute.addValue(value);
-						}
-					} else {
-						content.addAttribute(attribute);
+					if(fullTextColumnAsAdditionalAttribute) {
+						add(content, attribute);
 					}
+				} else {
+					add(content, attribute);
 				}
 			} // end if attribute value is not blank
 		} // end for
@@ -764,6 +769,19 @@ public class CsvContentProvider extends AbstractContentProvider {
 			}
 		}
 		return content;
+	}
+
+	private static void add(Content content, Attribute attribute) {
+		// empty attributes, the fulltext attribute (if present) and those that should
+		// be ignored are not added to the content object
+		Attribute existingAttribute = content.getAttributeByName(attribute.getName());
+		if (null != existingAttribute) {
+			for (String value : attribute.getValues()) {
+				existingAttribute.addValue(value);
+			}
+		} else {
+			content.addAttribute(attribute);
+		}
 	}
 
 	private String createContentUrlWithHashFromRawRecord(String rawRecord) throws UnsupportedEncodingException {

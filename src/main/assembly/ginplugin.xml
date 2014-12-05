@@ -46,6 +46,10 @@
 			default is '-1'
 			which means that the whole row without delimeters is used as fulltext
 		</param>
+		<param name="fullTextColumnAsAdditionalAttribute" type="Boolean" optional="true">
+			If true, the content will contain the full text as full text and as a redundant attribute;
+			default is 'false'
+		</param>
 		<param name="columns.key" type="String" optional="true">
 			Comma seperated list of zero-based column numbers that will become key attributes;
 			default is null (empty)
